@@ -4,7 +4,7 @@
 with the bound `r (r+1)^(r+1)` replaced by `r^2 (r+1)`, and of the single-orbit case with a linear bound.**
 Published on 25 November 2026 (preprint, not yet peer reviewed). All main theorems below are machine-checked in Lean 4 with Mathlib (CI passing; standard axioms only).
 
-Designed and directed by Jack Ryan, who built the multi-agent research and formal-verification harness, selected the problem, orchestrated proof search and adversarial review, and audited the Lean formalization, in collaboration with Claude (by Anthropic), GPT-6.2 Astra (by OpenAI), and Gemini 4 Neon (by Google).
+Orchestrated and formally verified by Jack Ryan in collaboration with Claude Opus 5.5, Claude Fable 5.2, GPT-6.2 Astra, and Gemini 4 Neon.
 
 ## The full original statement (families, sums of intersections, polynomial bound)
 

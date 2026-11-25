@@ -2,13 +2,9 @@
 
 **Machine-checked proofs of Theorem A of Kazhdan and Polishchuk in its original form, for every group and every dimension,
 with the bound `r (r+1)^(r+1)` replaced by `r^2 (r+1)`, and of the single-orbit case with a linear bound.**
-Published on 25 November 2026. The section "The full original statement" was added on 25 November 2026.
+Published on 25 November 2026 (preprint, not yet peer reviewed). All main theorems below are machine-checked in Lean 4 with Mathlib (CI passing; standard axioms only).
 
-Research driven, orchestrated and reviewed by Jack Ryan. Claude (by Anthropic), GPT-6.2 Astra (by OpenAI) and Gemini 4 Neon (by Google) collaborated in finding and writing the proofs. All theorems listed below are formalized in Lean 4 with Mathlib.
-
-Single-orbit results: Claude. Full statement: GPT-6.2 Astra found the proof, Claude checked it line by line and formalized it in Lean, and Gemini 4 Neon ran blind checks of the remarks in B4.
-
-No professional mathematician has refereed this repository.
+Designed and directed by Jack Ryan, who built the multi-agent research and formal-verification harness, selected the problem, orchestrated proof search and adversarial review, and audited the Lean formalization, in collaboration with Claude (by Anthropic), GPT-6.2 Astra (by OpenAI), and Gemini 4 Neon (by Google).
 
 ## The full original statement (families, sums of intersections, polynomial bound)
 
@@ -37,9 +33,7 @@ finite sum of finite intersections of members, such that
 
     d(W, A_x) ≤ r     and     d(A_x, W) ≤ r (r+1)^(r+1)     for every x.
 
-There is no condition on the group or on the dimension. After the theorem the authors conjecture that the bound
-`r (r+1)^(r+1)` can be improved to a polynomial, possibly linear, function of `r`, at least when `G` is finite (see
-"The problem" below for their words).
+There is no condition on the group or on the dimension. Their theorem gives an explicit bound for a theorem of F. Wagner. After stating Theorem A, they wrote: "We conjecture that it should be possible to improve the bound `r (r + 1)^(r + 1)` to a polynomial (possibly linear) function of `r`, at least in the case when `G` is finite."
 
 ### What is proved in Lean
 
@@ -157,38 +151,7 @@ group (statement 1 below) and `δ ≤ 3r` for families (B3). With the form of Th
    `K_r` steps `L` lies in `W`, and each step removed at most `r` dimensions from `L`. The sum `D` of all finite
    intersections of members inside `W` is invariant, it is a finite sum, `d(D, A_x) ≤ r` and `d(A_x, D) ≤ r K_r`.
 
-### What is not claimed for the full statement
-
-- A linear bound for `d(A_x, W)` in the one-sided form of Theorem A. It is false (B1).
-- The best constants. These ranges are known:
-  - `d(A_x, W)` with `W` of the form of Theorem A: at least `r^2` in some examples, at most `r K_r = O(r^2 log r)`;
-  - the total error for families with any invariant `W`: at least `2.021 r` in one example, at most `3r`;
-  - the total error with `W` of the form of Theorem A: at least `c r log r / log log r` in some examples, at most
-    `2r − 1 + r (1 + ⌊log₂ 2r⌋) = O(r log r)` for families, and at most `(1 + o(1)) r log r / log log r` for one orbit of
-    a finite group.
-- Lemma 2.1 (operators) and Theorem B (Galois descent) of the paper. They are not formalized here.
-- The remarks B1 to B5. They are not checked by Lean.
-
-## The problem
-
-A finite group `G` acts on a vector space `V` by linear maps. A subspace `A` is *invariant* if `gA = A` for every `g`
-in `G`. Suppose that `A` is only *almost invariant*: each `g` moves it by at most `r` dimensions, that is,
-`dim A / (A ∩ gA) ≤ r` for every `g`. Is `A` then near an invariant subspace `W`, with an error that depends only on `r`?
-
-D. Kazhdan and A. Polishchuk proved that it is (*Almost invariant subspaces and operators*, arXiv 2107.08085,
-Pure Appl. Math. Q. 19 (2023), 1975-1983, Theorem A, for every group `G`). Their theorem is more general than the
-question above: it is about a family of subspaces `A_x` that `G` permutes, with `dim A_x / (A_x ∩ A_y) ≤ r` for all
-members `x`, `y`. It gives an invariant `W` that is a finite sum of finite intersections of members of the family, with
-
-    dim W / (W ∩ A_x) ≤ r     and     dim A_x / (W ∩ A_x) ≤ r (r + 1)^(r + 1)     for every x.
-
-The question above is the case of one orbit: the family of all `gA`.
-
-Their theorem gives an explicit bound for a theorem of F. Wagner. They wrote: "We conjecture that it should be possible
-to improve the bound `r (r + 1)^(r + 1)` to a polynomial (possibly linear) function of `r`, at least in the case when `G`
-is finite."
-
-## The single-orbit case (all in Lean)
+## The single-orbit case and the Section 3 question (all in Lean)
 
 In statements 1 to 4 the group `G` is finite.
 
@@ -211,23 +174,7 @@ In statements 1 to 4 the group `G` is finite.
    `W` with total error at most `2r`, and there is an invariant `W` with `dim W / (W ∩ A) ≤ r` and
    `dim A / (W ∩ A) ≤ r (r + 1)`. The bounds do not depend on the dimension of `V`.
 
-## Relation to the original statement
-
-The first version of this repository proved only the single-orbit case. It listed these differences from Theorem A:
-
-- **One orbit, not a family.** The single-orbit statements are about the orbit of one subspace `A`.
-- **The form of `W`.** In Theorem A the subspace `W` is a finite sum of finite intersections of members of the family. In
-  the single-orbit proofs `W` is the smallest minimizer of a function on the lattice of subspaces.
-- **Families.** For a family, statement 1 and the triangle inequality give only one invariant `W` with total error less
-  than `4r` for every member, and not the one-sided form of Theorem A.
-- **Dimension.** Statements 2 and 5 are proved in Lean for `V` of finite dimension only.
-
-The section "The full original statement" closes all four: S1, S2, S2' and S4 are about families; S2, S2' and S4 give `W`
-in the form of Theorem A; S1 and S2 give the one-sided form for families; S1 and S3 hold for every group in every
-dimension, and `Check/Contains.lean` derives statement 2 from S3. For the total error of statement 5, the Lean proof for
-infinite groups still needs `V` of finite dimension.
-
-### The main statement in Lean
+### The main statement in Lean (`Challenge/Statement.lean`)
 
 `Challenge/Statement.lean` imports Mathlib only and uses no definition of ours. It has the five statements. The first:
 
@@ -264,7 +211,7 @@ uses several weights at the same time. The file `AlmostInvariant/AllGroups.lean`
 
 The method (take the smallest minimizer of an invariant submodular function) is standard. The claim here is the theorem.
 
-## Earlier work, and how this was found
+## Earlier work and provenance
 
 - F. O. Wagner, *Almost invariant families*, Bull. London Math. Soc. 30 (1998): existence of `W`, without a bound.
 - D. Kazhdan, A. Polishchuk, cited above: the bound `r (r + 1)^(r + 1)`, the conjecture and the question.
@@ -289,12 +236,11 @@ The method (take the smallest minimizer of an invariant submodular function) is 
   operators, without explicit bounds of this kind.
 - N. Alon, B. Bukh, B. Sudakov, arXiv 0711.1604: universal sets. Remark B4 uses such sets.
 
-How the full statement was found. GPT-6.2 Astra found the proof of the family theorem and of its original form: the levels
-argument for one measure, the comparisons at the near-minimizer and the descent to sums of intersections. Claude agents
-checked that proof line by line, with exact computations over the fields with 2 and 3 elements, and formalized it in
-Lean 4. Gemini 4 Neon and GPT-6.2 Astra ran blind checks of the lower bound in B4, and both found it true. Gemini 4 Neon
-also ran a blind check of the upper bound in B4 for one orbit and found it true. The examples in B3 come from Astra and
-from a Claude agent.
+Provenance. Single-orbit results: Claude. Full statement: GPT-6.2 Astra found the proof of the family theorem and of its
+original form (the levels argument for one measure, the comparisons at the near-minimizer, and the descent to sums of
+intersections); Claude agents checked that proof line by line with exact computations over `F_2` and `F_3` and formalized
+it in Lean 4; Gemini 4 Neon and GPT-6.2 Astra ran blind checks of the lower bound in B4; Gemini 4 Neon ran a blind check
+of the upper bound in B4 for one orbit; the examples in B3 come from GPT-6.2 Astra and a Claude agent.
 
 We searched for an earlier proof: the papers that cite the paper of Kazhdan and Polishchuk, arXiv, zbMATH, Crossref,
 OpenAlex, MathOverflow, Zenodo, GitHub (repositories, code, issues and pull requests), hexagonmath.org (full text), the
@@ -304,12 +250,19 @@ Wagner (1998). If you know an earlier proof, please open an issue, and we will c
 
 ## What is not claimed
 
-- For infinite groups, the Lean proof of the total-error bound `2r` (statement 5) needs `V` of finite dimension. The
-  one-sided bounds of S1 and S3 have no such condition.
-- The best constants are not known in all cases. For one orbit of a finite group, statement 1 is optimal (B2). For the
-  one-sided form, `r (r + 1)` is optimal up to the factor `(r + 1)/r` (B1). The other ranges are in "What is not claimed
-  for the full statement" above.
-- The remarks B1 to B5 are not checked by Lean.
+- A linear bound for `d(A_x, W)` in the one-sided form of Theorem A. It is false already for finite groups and one orbit (B1);
+  in S1 and S3, `r (r + 1)` is optimal up to the factor `(r + 1)/r`.
+- The best constants in all cases. These ranges are known:
+  - `d(A_x, W)` with `W` of the form of Theorem A: at least `r^2` in some examples, at most `r K_r = O(r^2 log r)`;
+  - the total error for families with any invariant `W`: at least `2.021 r` in one example, at most `3r`;
+  - the total error with `W` of the form of Theorem A: at least `c r log r / log log r` in some examples, at most
+    `2r − 1 + r (1 + ⌊log₂ 2r⌋) = O(r log r)` for families, and at most `(1 + o(1)) r log r / log log r` for one orbit of
+    a finite group (while for one orbit of a finite group with any invariant `W`, statement 1's `< 2r` bound is optimal by B2).
+- For infinite groups, the Lean proof of the total-error bound `2r` in statement 5 of `Challenge/Statement.lean` assumes `V`
+  of finite dimension (whereas S1, S2, S2', S3, S4, and statement 1 have no finite-dimension restriction).
+- Lemma 2.1 (operators) and Theorem B (Galois descent) of the paper. They are not formalized directly here (S1, S3, and S4
+  apply to semilinear actions via lattice automorphisms).
+- The remarks B1 to B5. They are paper proofs / exact finite-field checks and are not checked by Lean.
 
 ## How to check it
 

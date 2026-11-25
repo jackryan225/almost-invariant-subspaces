@@ -25,7 +25,7 @@ level set gives the UNIQUE exact minimizer, because `f_{μ,t}` takes values in a
 
 ---
 
-The polynomial conjecture in the full form of Theorem A holds for arbitrary families, arbitrary groups, and arbitrary dimension. The optimal constant for canonical total distance is a separate question. I obtain bounds on that constant and a finite counterexample to $C=2$.
+The polynomial conjecture in the full form of Theorem A holds for arbitrary families, arbitrary groups, and arbitrary dimension. The optimal constant for canonical total distance is a separate question. We obtain bounds on that constant and a finite counterexample to $C=2$.
 
 Let $r\ge1$ be an integer. In the table, each $W$ is fixed by every linear or semilinear bijection preserving the family, and each bound holds for **every** $x$.
 
@@ -37,11 +37,11 @@ Let $r\ge1$ be an integer. In the table, each $W$ is fixed by every linear or se
 
 The middle bound is $O(r^2\log(r+1))$. In particular, $r^2(r+1)$ is an explicit polynomial replacement for $r(r+1)^{r+1}$ in Theorem A, including its prescribed form of $W$.
 
-For the best universal constant in the third row, I prove
+For the best universal constant in the third row, we prove
 $$
 \boxed{\quad 2+\frac{2}{17475}\ \le\ C_{\rm can}\ \le\ 3.\quad}
 $$
-I do not determine its exact value. The lower bound holds for a finite linear group, a finite family of equal-dimensional subspaces, and a finite-dimensional complex vector space. Thus the proposed minimax argument cannot give the suggested uniform $2r$ conclusion. Without the canonicity requirement, the best universal coefficient is exactly $2$.
+We do not determine its exact value. The lower bound holds for a finite linear group, a finite family of equal-dimensional subspaces, and a finite-dimensional complex vector space. Thus no canonical construction can yield a uniform $2r$ total-distance bound for general families. Without the canonicity requirement, the best universal coefficient is exactly $2$.
 
 ## 1. A common measure and nested invariant subspaces
 
@@ -182,7 +182,7 @@ Fix $m$, choose $0<\xi<1/2$, and use the lemma in small intervals about $j/(m+1)
 $$
 \left|t_j-\frac{j}{m+1}\right|\le\frac{\xi}{m+1}.
 $$
-I first show that for every $x$,
+We first show that for every $x$,
 $$
 \frac1m\sum_{j=1}^m\delta(A_x,S_j)
 \le \frac{2(m+1)}m\,\frac{r+m\tau}{1-\xi}. \tag{5}
@@ -292,9 +292,9 @@ $$
 \frac{8L}{4L-1}=2+\frac2{17475}.
 $$
 
-This also disproves the proposed weighted conclusion throughout a sufficiently small interval around $1/2$, for sufficiently small $\varepsilon$, since $c_t(A,W)\ge(\tfrac12-|t-\tfrac12|)\delta(A,W)$.
+This also rules out a uniform weighted bound $c_t(A_x,W)\le r+\varepsilon r$ throughout a sufficiently small interval around $1/2$, for sufficiently small $\varepsilon$, since $c_t(A,W)\ge(\tfrac12-|t-\tfrac12|)\delta(A,W)$.
 
-The failure of the proposed uniqueness inference can already be seen in dimension one. For $X=\{0,k\}$, give $k$ mass $p$. Then $a_{\mu,t}=\min\{(1-t)p,t(1-p)\}$. At every interior level its unique maximizing measure has $p=t$, and both subspaces minimize. Maximizing a sum over levels supplies the invariance lemma in Section 1, but does not supply individual first-order optimality at the level where a minimizer becomes unique.
+The obstruction to a naive single-level minimax uniqueness argument can already be seen in dimension one. For $X=\{0,k\}$, give $k$ mass $p$. Then $a_{\mu,t}=\min\{(1-t)p,t(1-p)\}$. At every interior level its unique maximizing measure has $p=t$, and both subspaces minimize. Maximizing a sum over levels supplies the invariance lemma in Section 1, but does not supply individual first-order optimality at the level where a minimizer becomes unique.
 
 ## 6. Sharpness and the status of the conjecture
 

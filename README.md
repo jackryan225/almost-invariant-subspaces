@@ -3,8 +3,9 @@
 **A machine-checked proof of the single-orbit case of a conjecture of Kazhdan and Polishchuk, with a linear bound: for finite groups, and for all groups when the space has finite dimension. The conjecture in its full original generality is not claimed here; see "Relation to the original statement".**
 Published on 25 November 2026.
 
-AI agents (Claude, by Anthropic) found and wrote the proofs, under the direction of the owner of this account. The Lean
-proof checker accepts them. No human mathematician has reviewed this repository.
+Research driven, orchestrated and reviewed by Jack Ryan. AI agents (Claude, by Anthropic) found and wrote the proofs.
+All theorems listed below are formalized in Lean 4 with Mathlib, and the Lean proof checker accepts them.
+No professional mathematician has refereed this repository.
 
 ## The problem
 

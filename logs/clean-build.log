@@ -1,0 +1,143 @@
+=== start 2026-11-25T08:24:31Z on <host> in <home>/pnp-remote/p4m-clean
+ 'sh' '<home>/pnp-remote/scripts/p4m-clean.sh'
+--- STEP 0-sums: shasum -a 256 -c --quiet $HOME/pnp-remote/work/p4m-SHA256SUMS-sources.txt && echo SUMS-OK
+SUMS-OK
+
+--- STEP 0-sums: exit 0
+--- STEP 1-build: lake exe cache get && lake build
+push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: AlmostInvariant/AllGroups.lean:681:6: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: AlmostInvariant/AllGroups.lean:698:6: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+warning: AlmostInvariant/AllGroups.lean:780:30: Unused tactic linter: `push_cast at h2 ⊢` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+✔ [8929/8937] Built AlmostInvariant.Length (5.4s)
+ℹ [8930/8937] Built KPFull.SingleOrbit (4.5s)
+info: KPFull/SingleOrbit.lean:85:0: 'KPFamilies.rank_quotient_map_equiv' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: KPFull/SingleOrbit.lean:86:0: 'KPFamilies.kp_single_orbit' depends on axioms: [propext, Classical.choice, Quot.sound]
+✔ [8931/8937] Built KPFull.FinalS2 (4.9s)
+✔ [8932/8937] Built AlmostInvariant.Finite (4.8s)
+✔ [8933/8937] Built KPFull (4.2s)
+✔ [8935/8937] Built AlmostInvariant.VectorSpace (4.0s)
+✔ [8936/8937] Built AlmostInvariant (3.7s)
+Build completed successfully (8937 jobs).
+
+--- STEP 1-build: exit 0
+--- STEP 2-axioms: lake env lean Check/Axioms.lean
+'AlmostInvariant.almost_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AlmostInvariant.almost_invariant_module' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AlmostInvariant.exists_invariant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AlmostInvariant.question_negative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AlmostInvariant.question_negative_complex' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AlmostInvariant.OneSided.lattice_form' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AlmostInvariant.OneSided.almost_invariant_subspace' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AlmostInvariant.OneSided.almost_invariant_subspace_one_sided' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'AlmostInvariant.AllGroups.exists_fixed_total' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AlmostInvariant.AllGroups.exists_fixed_one_sided' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AlmostInvariant.AllGroups.almost_invariant_subspace_all' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+--- STEP 2-axioms: exit 0
+--- STEP 3-axiomsfull: lake env lean Check/AxiomsFull.lean
+'KPFamilies.kp_family_one_sided' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPFullFinal.kp_family_finite_form' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPFullFinal.kp_family_finite_form_sharp' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPFamilies.kp_single_orbit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPFullFinal.kp_family_canonical' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPFamilies.kp_family_one_sided_module' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPFamilies.kp_family_lattice' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPFullFinal.kp_family_finite_form_lattice' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPFull.PartB.partB' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+--- STEP 3-axiomsfull: exit 0
+--- STEP 4-same: lake build Challenge && lake env lean Check/SameStatement.lean
+⚠ [8924/8926] Built Challenge.Statement (24s)
+warning: Challenge/Statement.lean:21:8: declaration uses `sorry`
+warning: Challenge/Statement.lean:30:8: declaration uses `sorry`
+warning: Challenge/Statement.lean:40:8: declaration uses `sorry`
+warning: Challenge/Statement.lean:51:8: declaration uses `sorry`
+warning: Challenge/Statement.lean:61:8: declaration uses `sorry`
+⚠ [8925/8926] Built Challenge.StatementFull (24s)
+warning: Challenge/StatementFull.lean:33:8: declaration uses `sorry`
+warning: Challenge/StatementFull.lean:45:8: declaration uses `sorry`
+warning: Challenge/StatementFull.lean:58:8: declaration uses `sorry`
+warning: Challenge/StatementFull.lean:74:8: declaration uses `sorry`
+warning: Challenge/StatementFull.lean:86:8: declaration uses `sorry`
+Build completed successfully (8926 jobs).
+the five statements are equal as terms
+
+--- STEP 4-same: exit 0
+--- STEP 4-samefull: lake env lean Check/SameStatementFull.lean
+the five statements of the full form are equal as terms; no proved theorem uses sorryAx
+
+--- STEP 4-samefull: exit 0
+--- STEP 5-contains: lake env lean Check/Contains.lean
+'KPContains.one_sided_of_single_orbit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPContains.almost_invariant_one_sided' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+--- STEP 5-contains: exit 0
+--- STEP 6-grep: grep -rn -E 'sorry|native_decide|^axiom ' AlmostInvariant AlmostInvariant.lean KPFull KPFull.lean; echo "grep exit $? (1 = no line)"
+grep exit 1 (1 = no line)
+
+--- STEP 6-grep: exit 0
+--- STEP 7-leanchecker: lake env leanchecker -v AlmostInvariant.Length AlmostInvariant.Finite AlmostInvariant.VectorSpace AlmostInvariant.Question AlmostInvariant.OneSided AlmostInvariant.AllGroups KPFull.Families KPFull.PartB KPFull.FinalS2 KPFull.SingleOrbit
+replaying KPFull.SingleOrbit
+replaying KPFull.FinalS2
+replaying KPFull.PartB
+replaying KPFull.Families
+replaying AlmostInvariant.AllGroups
+replaying AlmostInvariant.OneSided
+replaying AlmostInvariant.Question
+replaying AlmostInvariant.VectorSpace
+replaying AlmostInvariant.Finite
+replaying AlmostInvariant.Length
+
+--- STEP 7-leanchecker: exit 0
+modules replayed: 10
+2-axioms: 10 standard of 11
+3-axiomsfull: 9 standard of 9
+5-contains: 2 standard of 2
+--- lean4export AlmostInvariant -- AlmostInvariant.almost_invariant AlmostInvariant.almost_invariant_module AlmostInvariant.OneSided.almost_invariant_subspace_one_sided AlmostInvariant.question_negative_complex AlmostInvariant.AllGroups.almost_invariant_subspace_all
+       15.84 real        11.63 user         3.49 sys
+          6094995456  maximum resident set size
+export bytes 367596092
+--- lean4export: exit 0
+theorems in export: 41353 axioms in export: ['Classical.choice', 'Quot.sound', 'propext'] missing named theorems: []
+EXPORT-OK
+--- lean4lean --import p4m-old.ndjson
+checked 53073 declarations
+       51.52 real        47.72 user         0.85 sys
+           748208128  maximum resident set size
+--- lean4lean: exit 0
+--- lean4export KPFull -- KPFamilies.kp_family_one_sided KPFullFinal.kp_family_finite_form KPFullFinal.kp_family_finite_form_sharp KPFamilies.kp_single_orbit KPFullFinal.kp_family_canonical
+       28.75 real         4.38 user         7.02 sys
+          5759057920  maximum resident set size
+export bytes 104163614
+--- lean4export: exit 0
+theorems in export: 13532 axioms in export: ['Classical.choice', 'Quot.sound', 'propext'] missing named theorems: []
+EXPORT-OK
+--- lean4lean --import p4m-new.ndjson
+checked 19247 declarations
+       10.51 real        10.22 user         0.10 sys
+           253001728  maximum resident set size
+--- lean4lean: exit 0
+=== exit 0 at 2026-11-25T08:30:55Z

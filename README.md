@@ -1,11 +1,173 @@
 # Almost invariant subspaces are close to invariant subspaces, in Lean 4
 
-**A machine-checked proof of the single-orbit case of a conjecture of Kazhdan and Polishchuk, with a linear bound: for finite groups, and for all groups when the space has finite dimension. The conjecture in its full original generality is not claimed here; see "Relation to the original statement".**
-Published on 25 November 2026.
+**Machine-checked proofs of Theorem A of Kazhdan and Polishchuk in its original form, for every group and every dimension,
+with the bound `r (r+1)^(r+1)` replaced by `r^2 (r+1)`, and of the single-orbit case with a linear bound.**
+Published on 25 November 2026. The section "The full original statement" was added on 25 November 2026.
 
-Research driven, orchestrated and reviewed by Jack Ryan. AI agents (Claude, by Anthropic) found and wrote the proofs.
-All theorems listed below are formalized in Lean 4 with Mathlib, and the Lean proof checker accepts them.
+Research driven, orchestrated and reviewed by Jack Ryan. Claude (by Anthropic), GPT-6.2 Astra (by OpenAI) and Gemini 4 Neon (by Google) collaborated in finding and writing the proofs. All theorems listed below are formalized in Lean 4 with Mathlib.
+
+Single-orbit results: Claude. Full statement: GPT-6.2 Astra found the proof, Claude checked it line by line and formalized it in Lean, and Gemini 4 Neon ran blind checks of the remarks in B4.
+
 No professional mathematician has refereed this repository.
+
+## The full original statement (families, sums of intersections, polynomial bound)
+
+### Terms
+
+- `K` is a division ring. Every field is a division ring. `V` is a vector space over `K`. Its dimension can be infinite.
+- For two subspaces `A` and `B` of `V`, put `d(A, B) = dim A/(A ∩ B)`. This number measures the part of `A` that is
+  outside `B`. In general `d(A, B)` and `d(B, A)` are different. The *total error* is `δ(A, B) = d(A, B) + d(B, A)`.
+- A group `G` *acts linearly* on `V`: each element `g` is an invertible linear map of `V`, and `(gh)v = g(hv)`.
+- A *family* is a set `X` on which `G` acts, with a subspace `A_x` of `V` for each `x` in `X`, such that `A_{gx} = g A_x`.
+  The members `A_x` are the subspaces of the family. A family can have several orbits. A collection of subspaces that `G`
+  maps to itself is a family (take `X` = the collection). The single-orbit case below is the family of all `gA`.
+- A subspace `W` is *invariant* if `gW = W` for every `g` in `G`.
+- A *finite sum of finite intersections of members* is a subspace `∑_{s ∈ S} ⋂_{x ∈ s} A_x`, where `S` is a finite
+  nonempty set of finite nonempty subsets of `X`.
+- `K_r = ∑_{j=1}^{r} ⌈(r+1)/j⌉`. Then `K_r ≤ r (r+1)`. Also `K_r ≤ (r+1)(1 + 1/2 + ... + 1/r) + r`, so `K_r = O(r log r)`.
+
+### Theorem A and the conjecture
+
+D. Kazhdan and A. Polishchuk, *Almost invariant subspaces and operators*, arXiv 2107.08085 (one version, July 2021),
+Pure Appl. Math. Q. 19 (2023), 1975-1983. Their Theorem A says the following (restated in the terms above).
+
+**Theorem A.** Let a group `G` act linearly on a vector space `V` over a field. Let `(A_x)` be a family with
+`d(A_x, A_y) ≤ r` for all `x` and `y` in `X`, where `r ≥ 1` is an integer. Then there is an invariant subspace `W` that is a
+finite sum of finite intersections of members, such that
+
+    d(W, A_x) ≤ r     and     d(A_x, W) ≤ r (r+1)^(r+1)     for every x.
+
+There is no condition on the group or on the dimension. After the theorem the authors conjecture that the bound
+`r (r+1)^(r+1)` can be improved to a polynomial, possibly linear, function of `r`, at least when `G` is finite (see
+"The problem" below for their words).
+
+### What is proved in Lean
+
+`Challenge/StatementFull.lean` imports Mathlib only and uses no definition of ours. It states five theorems, with `sorry`
+in place of each proof. Each statement has a proved twin in the folder `KPFull/`.
+
+- `Check/SameStatementFull.lean` checks that each statement and its proved twin have the same type, as terms.
+- `Check/AxiomsFull.lean` prints the axioms of each proved theorem. For each one the output is `propext`,
+  `Classical.choice` and `Quot.sound`, the three standard axioms of Lean and Mathlib.
+
+| Statement in `Challenge/StatementFull.lean` | Proved theorem | Content |
+|---|---|---|
+| `KPFull.kp_family_one_sided` (S1) | `KPFamilies.kp_family_one_sided` | There is an invariant `W` with `d(W, A_x) ≤ r` and `d(A_x, W) ≤ r (r+1)` for every `x`. |
+| `KPFull.kp_family_finite_form` (S2) | `KPFullFinal.kp_family_finite_form` | As S1, and `W` is a finite sum of finite intersections of members. The bounds are `r` and `r^2 (r+1)`. This is Theorem A with `r^2 (r+1)` in place of `r (r+1)^(r+1)`. |
+| `KPFull.kp_family_finite_form_sharp` (S2') | `KPFullFinal.kp_family_finite_form_sharp` | As S2 with the bound `r K_r`. |
+| `KPFull.kp_single_orbit` (S3) | `KPFamilies.kp_single_orbit` | One orbit: the family of all `gA`. If `d(A, gA) ≤ r` for every `g`, there is an invariant `W` with `d(W, A) ≤ r` and `d(A, W) ≤ r (r+1)`. |
+| `KPFull.kp_family_canonical` (S4) | `KPFullFinal.kp_family_canonical` | No group is given. There is a finite sum of finite intersections of members `W` with the bounds `r` and `r K_r`, and every order automorphism of the lattice of subspaces that permutes the members maps `W` to itself. |
+
+The conditions in all five statements:
+
+- `K` is any division ring, `G` is any group and `X` is any set with an action of `G`. Nothing is finite.
+- `V` can have infinite dimension. Each dimension is `Module.rank`, a cardinal number.
+- `r ≥ 0` is an integer.
+- S2, S2' and S4 assume that `X` is not empty. For an empty `X` the statement of Theorem A is degenerate.
+
+S4 contains S2'. A linear or semilinear bijection of `V` that permutes the members gives such a lattice automorphism.
+So S4 also applies to semilinear actions, for example to a Galois group that acts on `V_0 ⊗_k E`.
+
+More Lean theorems. They have no twin in the challenge file.
+
+- `KPFamilies.kp_family_one_sided_module`: S1 for submodules of a module over any ring, with the length of a module in
+  place of the dimension.
+- `KPFamilies.kp_family_lattice`: the same for a group that acts by order automorphisms of the lattice of submodules.
+- `KPFullFinal.kp_family_finite_form_lattice`: S2' for modules over any ring and a group of lattice automorphisms.
+- `KPFull.PartB.partB`: the step from a subspace `W` with the two bounds of S1 and the descent property of `PROOF.md`,
+  Section 3, to a finite sum of finite intersections of members, for modules over any ring.
+- `KPContains.almost_invariant_one_sided` (in `Check/Contains.lean`): the statement `almost_invariant_one_sided` of
+  `Challenge/Statement.lean` (statement 2 of the single-orbit case below), derived from S3. S3 has no condition on the
+  dimension and no condition on the group.
+
+### Remarks on paper (not in Lean)
+
+These results are not theorems of the Lean files. `REMARKS.md` has each statement, its proof or a reference to it, and
+the list of checks. "Paper proof" means a proof written by one model and read line by line by at least one other agent.
+
+- **B1. The one-sided bound needs order `r^2`.** For each prime power `q` there is a finite group and one orbit of
+  subspaces of a complex coordinate space with `r = q`, such that every invariant `W` with `d(W, A) ≤ r` has
+  `d(A, W) = r^2`. The example uses the lines of the projective plane over the field with `q` elements. Paper proof,
+  read by a second agent; exact check for `q = 2`.
+- **B2. Total error `2r − 1` for one orbit.** For `r = 2^(k−2)` there is one orbit of `GL_k(F_2)` where every subspace has
+  total error at least `2r − 1` to some member. So statement 1 of the single-orbit case is optimal. Paper proof, read by
+  two agents.
+- **B3. Total error for families.** Some invariant `W` has `δ(A_x, W) ≤ 3r` for every `x`. The constant 3 cannot be
+  replaced by 2. Paper proof of `3r`, read line by line by a second agent. Two finite examples have the ratio
+  `2 + 2/17475` (paper, read line by line) and `2.021` (exact integer computation, two independent programs).
+- **B4. Total error with the form of Theorem A.** For some single orbits of finite groups, every invariant finite sum of
+  finite intersections of members has total error at least `c r log r / log log r` from some member, with a constant
+  `c > 0`. Paper proof, two blind checks by two other models, exact checks for small cases. In the other direction, for every
+  family there is an invariant finite sum of finite intersections with total error at most
+  `2r − 1 + r (1 + ⌊log₂ 2r⌋)` from every member. Paper proof, read line by line by a second agent. For one orbit of a
+  finite group the best bound is of order `r log r / log log r`: the upper bound `(1 + o(1)) r log r / log log r` is a
+  paper proof by GPT-6.2 Astra, read by a Claude agent and confirmed by a blind check of Gemini 4 Neon.
+- **B5. The minimizer of the proof need not have the form of Theorem A.** For three members in `k^5` and also for an orbit
+  of the Klein four group in `k^7`, the minimizer is not a finite sum of finite intersections of members. This is why
+  the proof of S2 passes from `W` to a smaller subspace. Paper proof and exact computation over small fields.
+
+### Relation to the paper of Kazhdan and Polishchuk, clause by clause
+
+`FIDELITY.md` has the full comparison. In short, for Theorem A:
+
+| Clause of Theorem A | Here | Comparison |
+|---|---|---|
+| a vector space over a field | a vector space over a division ring | more general |
+| no condition on the dimension | no condition on the dimension | same |
+| a collection of subspaces that `G` preserves | a `G`-set `X` and `A : X → Submodule K V` with `A(gx) = g A_x` | equivalent |
+| any group, acting linearly | any group, a homomorphism `G → (V ≃ₗ[K] V)` | same |
+| `r ≥ 1` | `r ≥ 0` | more general |
+| `d(A_x, A_y) ≤ r` for all `x`, `y` | the same | same |
+| `W` is invariant | the same | same |
+| `W` is a finite sum of finite intersections of members | S2, S2', S4: the same, with at least one summand and no empty intersection; S1 and S3 do not ask for it | same in S2, S2', S4 |
+| `d(W, A_x) ≤ r` | the same, for every `x` | same |
+| `d(A_x, W) ≤ r (r+1)^(r+1)` | S2: `r^2 (r+1)`; S2' and S4: `r K_r`; S1 and S3: `r (r+1)` | smaller bound |
+
+The conjecture after Theorem A has two parts.
+
+- *Polynomial.* This part holds, for every group and not only for finite groups, in the exact form of Theorem A: S2 gives
+  `r^2 (r+1)`, and S2' gives `O(r^2 log r)`.
+- *Possibly linear.* This part is false in the one-sided form of Theorem A, already for finite groups and one orbit:
+  by B1, the second bound must be at least `r^2` for infinitely many `r`. S1 shows that `r (r+1)` is enough when `W` can be
+  any invariant subspace. With the form of Theorem A, the second bound lies between `r^2` and `r K_r`.
+
+For the total error `δ`, linear bounds exist when `W` can be any invariant subspace: `δ < 2r` for one orbit of a finite
+group (statement 1 below) and `δ ≤ 3r` for families (B3). With the form of Theorem A, B4 shows that no linear bound for
+`δ` exists.
+
+**A misprint in Lemma 2.1.** The paper prints the hypothesis of Lemma 2.1 (almost invariant operators) as
+`rk(gTg^{-1} − g) ≤ r`. The proof uses `rk(gTg^{-1} − T) ≤ r`. Lemma 2.1 is not formalized in this repository.
+
+### How the proof works
+
+`PROOF.md` has the proof in prose. Here is an outline.
+
+1. Fix one member `A_*`. All members and all subspaces below are commensurable with `A_*`: both `d(S, A_*)` and
+   `d(A_*, S)` are finite. For a probability measure `μ` with finite support on `X` and a level `t` with `0 < t < 1`, put
+   `f(S) = E_μ [ d(A_y, S) + t (d(S, A_y) − d(A_y, S)) ]`. This function is submodular:
+   `f(S ∩ T) + f(S + T) ≤ f(S) + f(T)`.
+2. Choose `μ` such that the sum of the minimum values of `f` over many levels is nearly as large as possible. Then at some
+   level `t` just above `r/(r+1)` there is only one near-minimizer `W`. Because the group permutes the members, the
+   group also permutes the near-minimizers. So `W` is invariant.
+3. Compare `f(W)` with `f(W + A_x)` and with `f(W ∩ A_x)`. This gives `(1 − t) d(A_x, W) ≤ r + τ` and
+   `t d(W, A_x) ≤ r + τ` with a small `τ`, for every member `A_x`, also when `x` is outside the support of `μ`.
+   With `t` just above `r/(r+1)` this gives `d(W, A_x) ≤ r` and `d(A_x, W) ≤ r (r+1)`. This is S1.
+4. For S2, start with `L = A_x`. The first comparison of step 3 gives a member `A_y` such that the part of `L ∩ A_y`
+   outside `W` is at most `r/(r+1)` times the part of `L` outside `W`. Replace `L` by `L ∩ A_y` and repeat. After at most
+   `K_r` steps `L` lies in `W`, and each step removed at most `r` dimensions from `L`. The sum `D` of all finite
+   intersections of members inside `W` is invariant, it is a finite sum, `d(D, A_x) ≤ r` and `d(A_x, D) ≤ r K_r`.
+
+### What is not claimed for the full statement
+
+- A linear bound for `d(A_x, W)` in the one-sided form of Theorem A. It is false (B1).
+- The best constants. These ranges are known:
+  - `d(A_x, W)` with `W` of the form of Theorem A: at least `r^2` in some examples, at most `r K_r = O(r^2 log r)`;
+  - the total error for families with any invariant `W`: at least `2.021 r` in one example, at most `3r`;
+  - the total error with `W` of the form of Theorem A: at least `c r log r / log log r` in some examples, at most
+    `2r − 1 + r (1 + ⌊log₂ 2r⌋) = O(r log r)` for families, and at most `(1 + o(1)) r log r / log log r` for one orbit of
+    a finite group.
+- Lemma 2.1 (operators) and Theorem B (Galois descent) of the paper. They are not formalized here.
+- The remarks B1 to B5. They are not checked by Lean.
 
 ## The problem
 
@@ -26,7 +188,7 @@ Their theorem gives an explicit bound for a theorem of F. Wagner. They wrote: "W
 to improve the bound `r (r + 1)^(r + 1)` to a polynomial (possibly linear) function of `r`, at least in the case when `G`
 is finite."
 
-## What this repository proves (all in Lean)
+## The single-orbit case (all in Lean)
 
 In statements 1 to 4 the group `G` is finite.
 
@@ -51,17 +213,19 @@ In statements 1 to 4 the group `G` is finite.
 
 ## Relation to the original statement
 
-This repository does not prove the conjecture in the full generality of Theorem A. The differences:
+The first version of this repository proved only the single-orbit case. It listed these differences from Theorem A:
 
-- **One orbit, not a family.** All Lean statements are about the orbit of one subspace `A` (the family of all `gA`). This is the
-  case that the paper uses for operators (its Lemma 2.1) and for Galois descent (its Theorem B).
-- **The form of `W`.** In Theorem A the subspace `W` is a finite sum of finite intersections of members of the family. Our `W`
-  is the smallest minimizer of a function on the lattice of subspaces. We do not prove that it has that form.
-- **Families.** For a family as in Theorem A, statement 1 for one orbit and the triangle inequality give one invariant `W` with
-  total error less than `4r` for every member. This step is a paper argument of two lines and is not in the Lean files. It does
-  not give the one-sided form of Theorem A (`dim W / (W ∩ A_x) ≤ r` together with a polynomial bound for the other side).
-- **Dimension.** Statement 2 (the form of Theorem A for one orbit) and statement 5 (all groups) are proved in Lean for `V` of
-  finite dimension only. Statements 1 and 3 allow infinite dimension.
+- **One orbit, not a family.** The single-orbit statements are about the orbit of one subspace `A`.
+- **The form of `W`.** In Theorem A the subspace `W` is a finite sum of finite intersections of members of the family. In
+  the single-orbit proofs `W` is the smallest minimizer of a function on the lattice of subspaces.
+- **Families.** For a family, statement 1 and the triangle inequality give only one invariant `W` with total error less
+  than `4r` for every member, and not the one-sided form of Theorem A.
+- **Dimension.** Statements 2 and 5 are proved in Lean for `V` of finite dimension only.
+
+The section "The full original statement" closes all four: S1, S2, S2' and S4 are about families; S2, S2' and S4 give `W`
+in the form of Theorem A; S1 and S2 give the one-sided form for families; S1 and S3 hold for every group in every
+dimension, and `Check/Contains.lean` derives statement 2 from S3. For the total error of statement 5, the Lean proof for
+infinite groups still needs `V` of finite dimension.
 
 ### The main statement in Lean
 
@@ -79,7 +243,7 @@ theorem almost_invariant {K V G : Type*} [DivisionRing K] [AddCommGroup V] [Modu
 Here `A.map (ρ g)` is `gA`, and `B.submoduleOf A` is `A ∩ B` as a subspace of `A`, so `A ⧸ B.submoduleOf A` is
 `A / (A ∩ B)`.
 
-## The proof, in ten lines
+## The proof of the single-orbit case, in ten lines
 
 For subspaces put `d(A, S) = dim A / (A ∩ S)` and `δ(A, S) = d(A, S) + d(S, A)`. Let
 
@@ -100,40 +264,68 @@ uses several weights at the same time. The file `AlmostInvariant/AllGroups.lean`
 
 The method (take the smallest minimizer of an invariant submodular function) is standard. The claim here is the theorem.
 
-## Earlier work
+## Earlier work, and how this was found
 
 - F. O. Wagner, *Almost invariant families*, Bull. London Math. Soc. 30 (1998): existence of `W`, without a bound.
 - D. Kazhdan, A. Polishchuk, cited above: the bound `r (r + 1)^(r + 1)`, the conjecture and the question.
-- P. M. Neumann, *Permutation groups and close-knit families of sets*, Arch. Math. 67 (1996); L. Brailovsky,
-  D. V. Pasechnik, C. E. Praeger, Proc. Amer. Math. Soc. 123 (1995); G. M. Bergman, H. W. Lenstra,
-  J. Algebra 127 (1989): the same problem for subsets of a set and for subgroups. For subsets the bound is `2r`, the same
-  constant as in statement 1.
+- P. M. Neumann, *Permutation groups and close-knit families of sets*, Arch. Math. 67 (1996), 265-274. We know this
+  paper from its review, zbMATH Zbl 0865.20004. By the review, Theorem 1.1 is about one set that each group element
+  changes in at most `m` points: there is an invariant set within `2m − 1` of it, and this is best possible. This is the
+  case of one orbit for sets. Theorem 3.4 has no group action: an infinite close-knit family of sets has some set within
+  `2m − 1` of every member. The last section asks questions about families of subgroups and of vector subspaces. We do not
+  claim an answer to these questions.
+  The closing section of P. M. Neumann, Arch. Math. 67 (1996) 265-274, was available to us only through its zbMATH review.
+- L. Brailovsky, D. V. Pasechnik, C. E. Praeger, Proc. Amer. Math. Soc. 123 (1995); G. M. Bergman, H. W. Lenstra,
+  J. Algebra 127 (1989): the same problem for subsets of a set and for subgroups of a group. For subsets the bound is
+  `2m − 1` (Neumann), the same as in statement 1.
+- U. Dardano, D. Dikranjan, S. Rinauro, arXiv 1705.02954: a survey of inert subgroups. It states the theorem of Bergman
+  and Lenstra with Neumann's bound `n^(n^n)`, and a version for abelian groups and groups of automorphisms.
+- I. Ben Yaacov, F. O. Wagner, J. Symbolic Logic (2020), and C. Milliet, J. Algebra (2017): versions without bounds.
 - M. Mastnak, M. Omladič, H. Radjavi, *Near-invariant subspaces for matrix groups are nearly invariant*,
   Linear Algebra Appl. 505 (2016), 269-281. To our knowledge this paper has the case `r = 1` for groups of matrices.
   We saw only summaries of it and did not read the full text.
+- Papers on almost invariant half-spaces of operators on Banach spaces (A. I. Popov 2010; L. W. Marcoux, A. I. Popov,
+  H. Radjavi 2013; A. I. Popov, A. Tcaciuc 2013; G. Sirotkin, B. Wallis 2016) study single operators and algebras of
+  operators, without explicit bounds of this kind.
+- N. Alon, B. Bukh, B. Sudakov, arXiv 0711.1604: universal sets. Remark B4 uses such sets.
 
-We searched for an earlier proof of the conjecture: the papers that cite the paper of Kazhdan and Polishchuk, arXiv,
-MathOverflow, and GitHub (repositories, issues, pull requests). We found none. A search cannot prove that there is none.
-If you know an earlier proof, please open an issue, and we will correct this page.
+How the full statement was found. GPT-6.2 Astra found the proof of the family theorem and of its original form: the levels
+argument for one measure, the comparisons at the near-minimizer and the descent to sums of intersections. Claude agents
+checked that proof line by line, with exact computations over the fields with 2 and 3 elements, and formalized it in
+Lean 4. Gemini 4 Neon and GPT-6.2 Astra ran blind checks of the lower bound in B4, and both found it true. Gemini 4 Neon
+also ran a blind check of the upper bound in B4 for one orbit and found it true. The examples in B3 come from Astra and
+from a Claude agent.
+
+We searched for an earlier proof: the papers that cite the paper of Kazhdan and Polishchuk, arXiv, zbMATH, Crossref,
+OpenAlex, MathOverflow, Zenodo, GitHub (repositories, code, issues and pull requests), hexagonmath.org (full text), the
+Kourovka Notebook, nilradical.ai, the Palomar registry, proofatlas.ai and vibemathed.com. We found none. A search cannot
+prove that there is none. We could not read the full texts of Neumann (1996), Brailovsky, Pasechnik and Praeger (1995) and
+Wagner (1998). If you know an earlier proof, please open an issue, and we will correct this page.
 
 ## What is not claimed
 
-- For infinite groups the Lean proof needs `V` of finite dimension. The theorem of Kazhdan and Polishchuk has no such condition.
-- We do not claim that `2r` or `r (r + 1)` is the best possible bound.
-- The conjecture for arbitrary invariant families, with `W` of the form in Theorem A, is not claimed (see above).
+- For infinite groups, the Lean proof of the total-error bound `2r` (statement 5) needs `V` of finite dimension. The
+  one-sided bounds of S1 and S3 have no such condition.
+- The best constants are not known in all cases. For one orbit of a finite group, statement 1 is optimal (B2). For the
+  one-sided form, `r (r + 1)` is optimal up to the factor `(r + 1)/r` (B1). The other ranges are in "What is not claimed
+  for the full statement" above.
+- The remarks B1 to B5 are not checked by Lean.
 
 ## How to check it
 
 ```
 lake exe cache get      # downloads compiled Mathlib
-lake build              # builds the six proof files (a few minutes)
-lake env lean Check/Axioms.lean          # each result: propext, Classical.choice, Quot.sound
-lake build Challenge && lake env lean Check/SameStatement.lean
+lake build              # builds the proof files of both parts (a few minutes)
+lake env lean Check/Axioms.lean          # single-orbit results: propext, Classical.choice, Quot.sound
+lake env lean Check/AxiomsFull.lean      # full statement: propext, Classical.choice, Quot.sound
+lake build Challenge && lake env lean Check/SameStatement.lean && lake env lean Check/SameStatementFull.lean
+lake env lean Check/Contains.lean        # statement 2 of the single-orbit case, derived from S3
 ```
 
 The Lean version is in `lean-toolchain` (4.34.1) and Mathlib is pinned in `lake-manifest.json`. The workflow in
 `.github/workflows/check.yml` runs these steps on each push. We also replayed the compiled proofs with `leanchecker`,
-the separate kernel checker that comes with Lean.
+the separate kernel checker that comes with Lean, and the proofs of the full statement also with `lean4lean`. The records
+are in `logs/`.
 
 | File | Content |
 |---|---|
@@ -143,7 +335,17 @@ the separate kernel checker that comes with Lean.
 | `AlmostInvariant/OneSided.lean` | statement 2, and a version for modular lattices with a rank function |
 | `AlmostInvariant/Question.lean` | statement 4 |
 | `AlmostInvariant/AllGroups.lean` | statement 5, and a version for modular lattices with a rank function |
-| `Challenge/Statement.lean` | the five statements, Mathlib only, without proofs |
+| `Challenge/Statement.lean` | the five single-orbit statements, Mathlib only, without proofs |
+| `KPFull/Families.lean` | S1 and its forms for modules and lattice automorphisms: the levels argument, the comparisons at the near-minimizer |
+| `KPFull/PartB.lean` | from `W` to a finite sum of finite intersections, in at most `K_r` steps |
+| `KPFull/FinalS2.lean` | S2, S2', S4, and the form of S2' for modules |
+| `KPFull/SingleOrbit.lean` | S3, from S1 |
+| `Challenge/StatementFull.lean` | the five statements of the full original statement, Mathlib only, without proofs |
+| `Check/Axioms.lean`, `Check/SameStatement.lean` | the checks of the single-orbit statements |
+| `Check/AxiomsFull.lean`, `Check/SameStatementFull.lean`, `Check/Contains.lean` | the checks of the full statement |
+| `FIDELITY.md` | Theorem A against the Lean statements, clause by clause |
+| `REMARKS.md` | the remarks B1 to B5 and their checks |
+| `PROOF.md` | the proof of the full statement in prose |
 
 ## Licence
 

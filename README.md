@@ -1,6 +1,6 @@
 # Almost invariant subspaces are close to invariant subspaces, in Lean 4
 
-**A machine-checked proof of a conjecture of Kazhdan and Polishchuk, with a linear bound: for finite groups, and for all groups when the space has finite dimension.**
+**A machine-checked proof of the single-orbit case of a conjecture of Kazhdan and Polishchuk, with a linear bound: for finite groups, and for all groups when the space has finite dimension. The conjecture in its full original generality is not claimed here; see "Relation to the original statement".**
 Published on 25 November 2026.
 
 AI agents (Claude, by Anthropic) found and wrote the proofs, under the direction of the owner of this account. The Lean
@@ -13,9 +13,13 @@ in `G`. Suppose that `A` is only *almost invariant*: each `g` moves it by at mos
 `dim A / (A ∩ gA) ≤ r` for every `g`. Is `A` then near an invariant subspace `W`, with an error that depends only on `r`?
 
 D. Kazhdan and A. Polishchuk proved that it is (*Almost invariant subspaces and operators*, arXiv 2107.08085,
-Pure Appl. Math. Q. 19 (2023), 1975-1983, Theorem A, for every group `G`): there is an invariant `W` with
+Pure Appl. Math. Q. 19 (2023), 1975-1983, Theorem A, for every group `G`). Their theorem is more general than the
+question above: it is about a family of subspaces `A_x` that `G` permutes, with `dim A_x / (A_x ∩ A_y) ≤ r` for all
+members `x`, `y`. It gives an invariant `W` that is a finite sum of finite intersections of members of the family, with
 
-    dim W / (W ∩ A) ≤ r     and     dim A / (W ∩ A) ≤ r (r + 1)^(r + 1).
+    dim W / (W ∩ A_x) ≤ r     and     dim A_x / (W ∩ A_x) ≤ r (r + 1)^(r + 1)     for every x.
+
+The question above is the case of one orbit: the family of all `gA`.
 
 Their theorem gives an explicit bound for a theorem of F. Wagner. They wrote: "We conjecture that it should be possible
 to improve the bound `r (r + 1)^(r + 1)` to a polynomial (possibly linear) function of `r`, at least in the case when `G`
@@ -44,9 +48,19 @@ In statements 1 to 4 the group `G` is finite.
    `W` with total error at most `2r`, and there is an invariant `W` with `dim W / (W ∩ A) ≤ r` and
    `dim A / (W ∩ A) ≤ r (r + 1)`. The bounds do not depend on the dimension of `V`.
 
-For a family of subspaces `A_x` that `G` permutes, with `dim A_x / (A_x ∩ A_y) ≤ r` for all `x`, `y` (the setting of
-Theorem A), statement 1 for one orbit and the triangle inequality give one invariant `W` with total error less than `4r`
-for every `x`. This last step is not in the Lean files.
+## Relation to the original statement
+
+This repository does not prove the conjecture in the full generality of Theorem A. The differences:
+
+- **One orbit, not a family.** All Lean statements are about the orbit of one subspace `A` (the family of all `gA`). This is the
+  case that the paper uses for operators (its Lemma 2.1) and for Galois descent (its Theorem B).
+- **The form of `W`.** In Theorem A the subspace `W` is a finite sum of finite intersections of members of the family. Our `W`
+  is the smallest minimizer of a function on the lattice of subspaces. We do not prove that it has that form.
+- **Families.** For a family as in Theorem A, statement 1 for one orbit and the triangle inequality give one invariant `W` with
+  total error less than `4r` for every member. This step is a paper argument of two lines and is not in the Lean files. It does
+  not give the one-sided form of Theorem A (`dim W / (W ∩ A_x) ≤ r` together with a polynomial bound for the other side).
+- **Dimension.** Statement 2 (the form of Theorem A for one orbit) and statement 5 (all groups) are proved in Lean for `V` of
+  finite dimension only. Statements 1 and 3 allow infinite dimension.
 
 ### The main statement in Lean
 
@@ -105,7 +119,7 @@ If you know an earlier proof, please open an issue, and we will correct this pag
 
 - For infinite groups the Lean proof needs `V` of finite dimension. The theorem of Kazhdan and Polishchuk has no such condition.
 - We do not claim that `2r` or `r (r + 1)` is the best possible bound.
-- The remark on families of subspaces (`4r`) is a paper argument of two lines.
+- The conjecture for arbitrary invariant families, with `W` of the form in Theorem A, is not claimed (see above).
 
 ## How to check it
 

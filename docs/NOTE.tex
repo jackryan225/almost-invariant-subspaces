@@ -1,0 +1,273 @@
+\documentclass[11pt]{amsart}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb,amsmath}
+\usepackage{url}
+\DeclareUrlCommand\lean{\urlstyle{tt}}
+\usepackage[hidelinks]{hyperref}
+\newtheorem*{lemma*}{Lemma}
+\newtheorem*{theorem*}{Theorem}
+\newcommand{\Lc}{\mathcal{L}}
+\newcommand{\Hr}{H_r}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{3em}
+\sloppy
+
+\title[Notes on the Lean proof of Theorem A]{Theorem A with a polynomial bound: the main lemma,\\ the constant $K_r$, and formula (3)}
+\date{25 November 2026}
+
+\begin{document}
+\maketitle
+
+\noindent This note accompanies the Lean~4 formalization at
+\url{https://github.com/jackryan225/almost-invariant-subspaces}, commit \texttt{ccbe925} (the Lean files are unchanged
+since commit \texttt{d199b31}). A reference \texttt{File.lean:$n$} gives the first line of the Lean declaration, or the
+line of a particular formula or proof step when that is what is meant; the proof and statement files cited by line are
+in the folders \texttt{KPFull/}, \texttt{AlmostInvariant/} and \texttt{Challenge/}. The files in \texttt{Challenge/}
+contain the statements with Mathlib definitions only and \texttt{sorry} in place of the proofs; the two files
+\texttt{Check/SameStatement.lean} and \texttt{Check/SameStatementFull.lean} verify that each of these declarations has
+the same type as its proved counterpart, up to renaming universe parameters. [KP] is
+arXiv:2107.08085v1. Section~1 describes the main lemma and the order of the formalized proof, with the Lean declaration
+for each step; the remarks marked \emph{on paper} there are not Lean statements. Section~2 is about the constant $K_r$,
+Section~3 gives the example for formula~(3) of [KP].
+
+\section*{0. Notation and the statement}
+
+Let $k$ be a division ring, $V$ a $k$-vector space of any dimension, $G$ a group acting $k$-linearly on $V$, $X$ a
+$G$-set, and $x\mapsto A_x$ subspaces with $A_{gx}=gA_x$. For subspaces put $d(A,B)=\dim A/(A\cap B)$. Let $r\ge0$ be an
+integer ([KP] assumes $r\ge1$), assume $X\neq\varnothing$, and assume
+\[ (H_r)\qquad d(A_x,A_y)\le r\quad\text{for all }x,y\in X; \qquad\qquad \text{put}\quad
+K_r:=\sum_{j=1}^{r}\Bigl\lceil\frac{r+1}{j}\Bigr\rceil .\]
+
+\begin{theorem*}[S2$'$]
+There is a finite nonempty set $\mathcal S$ of finite nonempty subsets of $X$ such that
+$D=\sum_{s\in\mathcal S}\bigcap_{x\in s}A_x$ satisfies $gD=D$ for all $g\in G$, and
+$d(D,A_x)\le r$, $d(A_x,D)\le r\,K_r$ for every $x\in X$.
+\end{theorem*}
+
+\noindent Lean: \lean{KPFullFinal.kp_family_finite_form_sharp} (\texttt{FinalS2.lean:21}); the Mathlib-only statement is
+\lean{KPFull.kp_family_finite_form_sharp} (\lean{Challenge/StatementFull.lean:58}). The form with $r^2(r+1)$ (S2,
+\texttt{FinalS2.lean:38}) follows from $K_r\le r(r+1)$ (\lean{Kr_le}, \texttt{PartB.lean:231}).
+
+\section*{1. The main lemma and how it enters the proof}
+
+\subsection*{1.1 The function} Fix $x_0\in X$ and put $A_*=A_{x_0}$. Let $\Lc$ be the set of subspaces $S$ with
+$d(S,A_*)$ and $d(A_*,S)$ finite (\lean{KPFamilies.CL}, \texttt{Families.lean:989}). It is closed under $\cap$ and $+$
+(\texttt{:957, 964, 991}), contains every $A_x$ by $(H_r)$ (\texttt{:1154}), and is $G$-stable (\texttt{:1049}). The
+relative index $\rho(S)=d(S,A_*)-d(A_*,S)$ is strictly monotone (\lean{rkA_strict}, \texttt{:997}) and modular
+(\lean{rkA_mod}, \texttt{:1015}) on $\Lc$, and $\rho(T)-\rho(S)=\dim T/S$ for $S\subseteq T$ in $\Lc$
+(\lean{rkA_sub_inf}, \texttt{:1122}). It is $G$-invariant (\lean{rkA_inv}, \texttt{:1108}), because
+$g\mapsto\rho(gA_*)$ is a homomorphism $G\to\mathbb Z$ with values in $[-r,r]$, hence zero (\lean{chi_zero},
+\texttt{:1073}).
+
+For a finite nonempty list $g_1,\dots,g_N$ in $G$ (repetitions allowed) put $A_i=g_iA_*$ and, for $0\le t\le1$ and
+$S\in\Lc$,
+\begin{equation}\label{f}
+f_t(S)=\frac1N\sum_{i=1}^N\bigl((1-t)\,d(A_i,S)+t\,d(S,A_i)\bigr)\tag{1.1}
+\end{equation}
+(\lean{KPFamLat.f}, \texttt{Families.lean:68}, written there as
+$\frac1N\sum_i(\rho(A_*)-\rho(A_i\cap S))+t(\rho(S)-\rho(A_*))$, which equals \eqref{f} because $\rho(A_i)=\rho(A_*)$).
+The function $f_t$ is submodular, $f_t(S\cap T)+f_t(S+T)\le f_t(S)+f_t(T)$ (\lean{f_sub}, \texttt{:107}), and translating
+both $S$ and the list by $g$ does not change it (\lean{f_translate}, \texttt{:135}).
+
+\subsection*{1.2 Step 1: an invariant near-minimizer, for every group}
+(\lean{KPFamLat.exists_fixed_first_order}, \texttt{Families.lean:603}; its proof chooses the levels and the list and
+applies \lean{exists_fixed_of_levels}, \texttt{:392}.) For $0<\ell<h<1$ and $\theta>0$ there are a finite nonempty list
+$g_1,\dots,g_N$, a level $t\in[\ell,h]$, and $W\in\Lc$ with $gW=W$ for all $g\in G$ and $f_t(W)\le\inf_\Lc f_t+\theta$.
+
+\emph{Idea.} Put $\kappa=\ell(1-h)$. Choose $n$ levels $t_1<\dots<t_n$ in $[\ell,h]$ and $\varepsilon>0$ with
+$4\varepsilon\le\theta$, $16\varepsilon$ smaller than the spacing of the levels, and $n(\kappa-16\varepsilon)>r$; then
+choose a list for which $\sum_j\inf f_{t_j}$ is within $\varepsilon$ of its supremum over all lists (each term is at most
+$r$: test $S=A_*$). Appending the translated list $gg_1,\dots,gg_N$ averages $f_t$ with a translate of itself, so no
+$\inf f_{t_j}$ decreases; hence each increases by at most $\varepsilon$, and at each level, for each $g$, there is a
+$4\varepsilon$-minimizer $S$ such that $g^{-1}S$ is again one (\lean{step_one}, \texttt{:198}). So a level with only one
+$4\varepsilon$-minimizer gives an invariant one. If every level has two distinct $4\varepsilon$-minimizers, their
+intersections and sums give $8\varepsilon$-minimizers $P_j\subsetneq Q_j$ (submodularity), and \lean{chain}
+(\texttt{:293}) gives $Q_{j+1}\subseteq P_j$, using $f_u-f_t=(u-t)\rho+\mathrm{const}$ and the separation of the levels.
+A double average over the list, formed from these chains, is at least $\kappa-16\varepsilon$ at each level
+(\texttt{:507}), while a telescoping estimate bounds the sum of these averages over the levels by $r$ (\lean{telescope},
+\texttt{:379}; \lean{psi_le_r}, \texttt{:355}). This contradicts $n(\kappa-16\varepsilon)>r$.
+
+\subsection*{1.3 Step 2: comparison with $W+B$ and $W\cap B$}
+(\lean{KPFamLat.first_order}, \texttt{Families.lean:238}.) Let $f_t(W)\le f_t(S)+\theta$ for all $S\in\Lc$, and let
+$B\in\Lc$ satisfy $d(B,gA_*)\le r$ and $d(gA_*,B)\le r$ for every $g\in G$ (the proof uses these bounds only for the listed
+translates $A_i$). Then
+\begin{equation}\label{fo}
+(1-t)\,d(B,W)\le r+\theta,\qquad t\,d(W,B)\le r+\theta .\tag{1.2}
+\end{equation}
+Indeed $f_t(W+B)-f_t(W)=t\,d(B,W)-\frac1N\sum_i\dim\frac{A_i\cap(W+B)}{A_i\cap W}$, and the $i$-th dimension is at
+least $\dim\frac{A_i\cap B}{A_i\cap B\cap W}\ge d(B,W)-d(B,A_i)\ge d(B,W)-r$. Similarly
+$f_t(W\cap B)-f_t(W)=-t\,d(W,B)+\frac1N\sum_i\dim\frac{A_i\cap W}{A_i\cap W\cap B}\le -t\,d(W,B)+r$. Both differences
+are at least $-\theta$.
+
+By $(H_r)$ every member $B=A_x$ satisfies the hypothesis, whether or not it occurs in the list. With the level interval
+just above $r/(r+1)$ and $\theta$ small enough, integrality gives $d(W,A_x)\le r$ and $d(A_x,W)\le r(r+1)$ for every $x$
+(\lean{exists_fixed_family_one_sided}, \texttt{:696}; \lean{KPFamilies.kp_family_export}, \texttt{:1139}). This proves S1
+(\lean{KPFamilies.kp_family_one_sided}, \texttt{:1328}) for nonempty $X$; S1 imposes no condition on the form of $W$, and
+for empty $X$ one takes $W=0$ (\texttt{:1264}).
+
+\subsection*{1.4 Step 3: the enlargement inequality}
+Let $\pi:V\to V/W$. For $E\supseteq W$ with $\dim E/W<\infty$,
+$f_t(E)-f_t(W)=t\dim(E/W)-\frac1N\sum_i\dim\pi(A_i\cap E)$, so near-minimality gives
+\begin{equation}\label{one}
+\frac1N\sum_{i=1}^N\dim\pi(A_i\cap E)\;\le\;t\,\dim(E/W)+\theta\qquad\text{for every such }E .\tag{1.3}
+\end{equation}
+This is the last clause of \lean{exists_fixed_first_order} (\texttt{:609}, stated there for every $E\in\Lc$),
+specialized to finite-dimensional enlargements of $W$. \lean{kp_family_export} (\texttt{:1139}) gives its weighted form:
+nonnegative weights $\mu(y)$ on a finite set of indices, with sum $1$ (the list, pushed to $X$), and
+$\sum_y\mu(y)\,d((A_y+W)\cap E,W)\le t\,d(E,W)+\theta$ for $E\supseteq W$ with $d(E,W)$ finite; here
+$(A_y+W)\cap E=(A_y\cap E)+W$ (\texttt{Families.lean:1242}) and $d((A_y+W)\cap E,W)=d(A_y\cap E,W)$
+(\texttt{PartB.lean:531}). It also gives the two bounds of Step~2, $\theta\ge0$, and
+\begin{equation}\label{three}
+\frac r{r+1}\le t,\qquad \Bigl(t-\frac r{r+1}\Bigr)\,r(r+1)+\theta<\frac1{r+1}.\tag{1.4}
+\end{equation}
+
+\subsection*{1.5 Step 4: the main lemma}
+
+\begin{lemma*}[contraction]
+Let $W\subseteq V$, let $\mu$ be a probability measure on a finite set of indices, and let $t,\theta$ satisfy \eqref{one}
+\textup(with $\mu$ in place of the uniform measure on the list\textup) and \eqref{three}. Then for every $x\in X$ and every
+subspace $L\subseteq A_x$ with
+\[1\le n:=\dim L/(L\cap W)\le r(r+1)\]
+there is $y\in X$ with
+\[(r+1)\,\dim\frac{L\cap A_y}{L\cap A_y\cap W}\;\le\;r\,n,\qquad\text{that is}\qquad
+\dim\pi(L\cap A_y)\le\Bigl\lfloor\frac{rn}{r+1}\Bigr\rfloor .\]
+\end{lemma*}
+
+\noindent Lean: \lean{KPFull.PartB.descent_of_export} (\texttt{PartB.lean:537}), which reduces to
+\lean{descent_of_first_order} (\texttt{PartB.lean:492}); the conclusion is the predicate \lean{Descent}
+(\texttt{PartB.lean:282}) with bound $r(r+1)$, whose witness is some $y\in X$. The proof below gives, on paper, a $y$ with
+$\mu(y)>0$.
+
+\emph{Proof.} Put $E=L+W$; then $\dim E/W=n$. By \eqref{one} some $y$ with $\mu(y)>0$ has
+$\dim\pi(A_y\cap E)\le tn+\theta$. By \eqref{three} and $n\le r(r+1)$,
+\[(r+1)(tn+\theta)=rn+(r+1)\Bigl[\Bigl(t-\tfrac r{r+1}\Bigr)n+\theta\Bigr]
+\le rn+(r+1)\Bigl[\Bigl(t-\tfrac r{r+1}\Bigr)r(r+1)+\theta\Bigr]<rn+1 .\]
+So $(r+1)\dim\pi(A_y\cap E)\le rn$ by integrality, and $L\cap A_y\subseteq A_y\cap E$. \qed
+
+In words: for each finite-dimensional $U\subseteq V/W$ the mean of $\dim(U\cap\pi A_y)$ is at most $t\dim U+\theta$. For
+$U=\pi L$ with $\dim U$ in the stated range, \eqref{three} and integrality give one member $A_y$, depending on $L$, with
+$\dim\pi(L\cap A_y)\le rn/(r+1)$. The property of $W$ used is the enlargement inequality \eqref{one}, which comes from
+near-minimality.
+
+\subsection*{1.6 Step 5: iteration}
+(\lean{KPFull.PartB.descent}, \texttt{PartB.lean:288}; \lean{exists_inter_le}, \texttt{:334}.) Fix $x$, put $L_0=A_x$,
+and write $n_k=d(L_k,W)$, so $n_0\le r(r+1)$. While $n_k\ge1$ the lemma gives $y_k$; put $L_{k+1}=L_k\cap A_{y_k}$, so
+$n_{k+1}\le n_k-\lceil n_k/(r+1)\rceil$. Each step costs $\dim L_k/L_{k+1}=d(L_k,A_{y_k})\le d(A_x,A_{y_k})\le r$,
+because $L_k\subseteq A_x$. While $(j-1)(r+1)<n\le j(r+1)$, each step lowers $n$ by at least $j$, so this band is crossed
+in at most $\lceil (r+1)/j\rceil$ steps; since $n_0\le r(r+1)$, the descent from $A_x$ takes at most $K_r$ steps. In Lean
+this count is a potential
+$\mathrm{pot}(n)=\sum_{j=0}^{r-1}\bigl\lceil\min\bigl((n-j(r+1))_+,\,r+1\bigr)/(j+1)\bigr\rceil$ (\lean{pot},
+\texttt{:129}), with $\mathrm{pot}(n)\le\mathrm{pot}(r(r+1))=K_r$ for $n\le r(r+1)$ (\lean{pot_top}, \texttt{:139};
+\lean{pot_le_Kr}, \texttt{:149}), which drops by at least one at each step (\lean{pot_step}, \texttt{:152}). Applying
+\lean{exists_inter_le} with bound $r(r+1)$ and the potential $\mathrm{pot}$, then \lean{pot_top}, gives
+(\texttt{PartB.lean}, lines 465--470) a finite set $T_x\ni x$ with
+\[L_x:=\bigcap_{y\in T_x}A_y\subseteq W,\qquad d(A_x,L_x)\le r\,K_r .\]
+
+\subsection*{1.7 Step 6: assembly}
+(\lean{KPFull.PartB.partB}, \texttt{PartB.lean:459}.) Let $D$ be the sum of the subspaces $\bigcap_{y\in T}A_y$ over all
+finite nonempty $T\subseteq X$ with $\bigcap_{y\in T}A_y\subseteq W$ (\lean{sumInter}, \texttt{:264}). Then $D\subseteq W$
+gives $d(D,A_x)\le d(W,A_x)\le r$; $L_x\subseteq D$ gives $d(A_x,D)\le rK_r$; $D$ is $G$-invariant because $G$ permutes the
+members and fixes $W$ (\lean{sumInter_map_eq_of_group}, \texttt{:446}); and $D$ is a finite sum, because
+$\dim W/L_x\le d(W,A_x)+d(A_x,L_x)<\infty$ for one $x$ (\lean{sumInter_eq_finite}, \texttt{:353}). This gives S2$'$
+(\lean{kp_family_finite_form_sharp_of_W}, \texttt{PartB.lean:633}, and \texttt{FinalS2.lean:21}). The same steps for
+the group of all order automorphisms of the lattice of subspaces that permute the members give the canonical form S4
+(\lean{KPFullFinal.kp_family_canonical}, \texttt{FinalS2.lean:82}). The Lean statement gives no explicit bound on the
+number of summands of $D$.
+
+\subsection*{1.8 Where the polynomial comes from (on paper)}
+In [KP, \S2.1], $A_S=\bigcap_{y\in S}A_y$, $\mathcal S_m$ is the set of nonempty $S\subseteq X$ with
+$d(A_S,A_x)\le m$ for every $x$, and $h(m)$ is the least size of a set in $\mathcal S_m$ ($h(m)=\infty$ if none is finite);
+$h(r)=1$. There are two cases. If $m$ is the
+largest index with $h(m)<\infty$ and $h(m-1)>(r+1)h(m)+1$, the inequalities $h(m'-1)\le(r+1)h(m')+1$ for $m'>m$ give
+$h(m)\le(r+1)^r$; $W$ is the sum of the $A_S$ with $S\in\mathcal S_m$ and $|S|=h(m)$, and
+$d(A_x,W)\le d(A_x,A_S)\le r\,h(m)\le r(r+1)^r$. If the inequality holds at every index, then $h(0)\le(r+1)^{r+1}$ and
+$W=\bigcap_{x\in X}A_x=A_S$ for an $S$ of size $h(0)$, so $d(A_x,W)\le r(r+1)^{r+1}$. In both cases the bound is $r$ times
+the number of members in an intersection contained in $W$. The accounting in Steps~5--6 is the same, $r$ for each member
+intersected, but for each $x$ at most $K_r\le r(r+1)$ members are intersected besides $A_x$ itself, which gives the total
+bound $d(A_x,D)\le rK_r$. The difference is the order of the construction. The levels argument first selects a list, a
+level $t$ and an invariant near-minimizer $W$ on $\Lc$; with the chosen $t$ and $\theta$, comparison gives the a priori
+bound of Step~2 and the enlargement inequality used in Step~4. Only then does the descent construct $L_x\subseteq A_x\cap
+W$, at controlled codimension in $A_x$, choosing each next member so that $\dim\pi(L\cap A_y)\le\frac r{r+1}\dim\pi L$.
+The same choice of level interval and of a small $\theta$ gives the bound $r$ in Step~2 and the ratio $r/(r+1)$ in
+Step~4.
+
+\section*{2. The constant $K_r$}
+
+$K_r=\sum_{j=1}^r\lceil (r+1)/j\rceil$ is a bound for the number of steps in Step~5; the bound for $d(A_x,D)$ is
+$r\,K_r$. In Lean, \lean{KPFull.PartB.Kr} (\texttt{PartB.lean:125}) is $\sum_{j=0}^{r-1}\lfloor (r+1+j)/(j+1)\rfloor$
+(natural-number division); \lean{Kr_eq_ceil} (\texttt{:221}) proves that it equals the ceiling form, which appears
+literally in the statements S2$'$ and S4 (\lean{Challenge/StatementFull.lean:67, 95}).
+
+\emph{In Lean:} the ceiling identity, the bound $K_r\le r(r+1)$ (\lean{Kr_le}, \texttt{PartB.lean:231}), and the
+consequence $rK_r\le r^2(r+1)$, which is how S2 follows from S2$'$ (\texttt{FinalS2.lean}, lines 50--53). The harmonic bounds and their asymptotic
+consequences below are on paper.
+
+\emph{On paper, not formalized:} since $(r+1)/j\le\lceil (r+1)/j\rceil=\lfloor (r+j)/j\rfloor\le r/j+1$,
+\[(r+1)\Hr\;\le\;K_r\;\le\;r\,(\Hr+1),\qquad \Hr=\sum_{j=1}^r\frac1j .\]
+So $K_r$ is of order $r\log r$, and the bound $rK_r$ of S2$'$ is of order $r^2\log r$; the cubic $r^2(r+1)$ of S2 comes
+from the cruder $K_r\le r(r+1)$. The estimate $O(r^2\log r)$ refers to $rK_r$; equivalently $K_r=O(r\log r)$. Small
+values:
+
+\begin{center}
+\begin{tabular}{c|cccccc}
+$r$ & 1 & 2 & 3 & 4 & 5 & 10\\\hline
+$K_r$ & 2 & 5 & 8 & 12 & 15 & 37\\
+$r\,K_r$ & 2 & 10 & 24 & 48 & 75 & 370\\
+$r^2(r+1)$ & 2 & 12 & 36 & 80 & 150 & 1100\\
+$r(r+1)^{r+1}$ & 4 & 54 & 768 & 12500 & 233280 & $\approx 2.9\cdot10^{12}$
+\end{tabular}
+\end{center}
+
+\noindent \emph{Lower bound, on paper, not formalized} (repository file \texttt{REMARKS.md}, B1): let $q$ be a prime power
+and $r=q$. For each line $\ell$ of the projective plane over $\mathbb F_q$, let $A_\ell\subseteq\mathbb C^{q^2+q+1}$ be the
+coordinate span of the points off $\ell$. These subspaces form one orbit of the finite group generated by
+$\mathrm{PGL}_3(\mathbb F_q)$, acting on the points, and the coordinate sign changes, and $d(A_\ell,A_m)=q$ for
+$\ell\ne m$. Every invariant $W$ with $d(W,A_\ell)\le q$ for all $\ell$ has $d(A_\ell,W)=q^2$. So in the form of Theorem~A,
+with the first bound $r$, the best second bound lies between $r^2$ (for these $r$) and $rK_r$; we do not know where.
+
+\section*{3. Formula (3)}
+
+In [KP, \S3], for finite $G$ and $A\subseteq V$ with $\dim A/(A\cap gA)\le r$ for every $g\in G$, formula~(3) is
+$A_0=\sum_{|S|>|G|/2}A_S$ with $A_S=\bigcap_{g\in S}gA$, and the Question asks whether a polynomial, or even linear,
+function $c(r)$ bounds both $\dim A/(A_0\cap A)$ and $\dim A_0/(A_0\cap A)$. The example below rules out every bound that
+depends on $r$ only, already for $r=1$.
+
+\emph{The construction} (\lean{AlmostInvariant.question_negative}, \lean{AlmostInvariant/Question.lean:127}).
+Let $k$ be a field, $n\ge1$, and $H\subset k^\times$ a finite subgroup with $|H|\ge 2n-1$. Let $H$ act on $k^n$ by
+\[t\cdot(x_1,x_2,\dots,x_n)=(t\,x_1,\;t^2x_2,\;\dots,\;t^nx_n)\]
+(\lean{powAct}, \texttt{:20}, restricted to $H$ at \texttt{:133}; the action is faithful, by the first coordinate,
+\texttt{:29}), and let $A=\{x:\ x_1+\dots+x_n=0\}$ (\lean{hyp}, \texttt{:39}). The three conclusions (a)--(c) below are
+proved together in \lean{question_negative}.
+\begin{itemize}
+\item[(a)] $tA=\ker\lambda_t$ with $\lambda_t(x)=\sum_{i=1}^n t^{-i}x_i$ (\lean{map_hyp}, \texttt{:41}). Since
+$\lambda_t(e_1)=t^{-1}\ne0$, every $tA$ is a hyperplane, and $\dim A/(A\cap tA)\le1$ for every $t$
+(\lean{rank_le_one}, \texttt{:58}): the hypothesis holds with $r=1$.
+\item[(b)] $A_0=0$. If $|S|>|H|/2$ then $|S|\ge n$. If $y\in\bigcap_{t\in S}tA$, the polynomial
+$q(z)=\sum_{i=1}^n y_iz^{i-1}$ has degree $<n$, and $\lambda_t(y)=t^{-1}q(t^{-1})=0$ for at least $n$ distinct values
+$t^{-1}$; so $q=0$ and $y=0$. So each intersection in (3) is zero (\lean{inf_eq_bot}, \texttt{:68}), hence $A_0=0$
+(\texttt{:130}, proved at lines 136--148).
+\item[(c)] $\dim A=n-1$ (\lean{finrank_hyp}, \texttt{:111}).
+\end{itemize}
+Over $\mathbb C$: for each $c\in\mathbb N$, \lean{AlmostInvariant.question_negative_complex} (\texttt{Question.lean:151};
+Mathlib-only statement \lean{Challenge/Statement.lean:51}) asserts that there are $n$, a finite group $H$ acting linearly
+on $\mathbb C^n$, and $A$ with $r=1$ and $\dim A/(A\cap A_0)>c$. Its proof takes $n=c+2$ and $H=\mu_{2n}$, the group of
+$2n$-th roots of unity, for which $\dim A/(A\cap A_0)=\dim A=c+1$ (lines 157--166).
+
+\emph{The smallest case by hand} ($c=0$). $n=2$, $H=\{1,i,-1,-i\}$ acting by $\mathrm{diag}(t,t^2)$. Then
+$A=\mathbb C(1,-1)$ and $tA=\mathbb C(t,-t^2)=\mathbb C(1,-t)$, so the four translates are the lines
+$\mathbb C(1,-1)$, $\mathbb C(1,-i)$, $\mathbb C(1,1)$, $\mathbb C(1,i)$ (for $t=1,i,-1,-i$). They are distinct, so
+$\dim A/(A\cap tA)=1$ for $t\ne1$. A set $S$ with $|S|>2$ has at least three elements, and three distinct lines in
+$\mathbb C^2$ meet in $0$; so $A_0=0$ while $\dim A=1$. For $n=3$, $H=\mu_6$, $A=\{x_1+x_2+x_3=0\}$: a set $S$ with
+$|S|\ge4$ contains three distinct $t_a$; put $s_a=t_a^{-1}$. Then $\det(s_a^{\,b})_{a,b=1}^3=s_1s_2s_3\prod_{a<b}(s_b-s_a)\ne0$; so
+$A_0=0$ while $\dim A=2$.
+
+\emph{Remark.} $V$ itself is invariant, with $d(V,A)=1$ and $d(A,V)=0$. The example concerns only the explicit subspace
+of formula~(3), not the existence of an invariant subspace near $A$. Across these complex examples the second quantity of the
+Question, $\dim A_0/(A_0\cap A)$, is always $0$, and the first equals $n-1$, which is unbounded as $n$ varies.
+
+\begin{thebibliography}{KP}
+\bibitem[KP]{KP} D.~Kazhdan and A.~Polishchuk, \emph{Almost invariant subspaces and operators}, arXiv:2107.08085
+(2021); Pure Appl.\ Math.\ Q.\ \textbf{19} (2023), 1975--1983.
+\end{thebibliography}
+
+\end{document}

@@ -20,7 +20,9 @@ Orchestrated and formally verified by Jack Ryan in collaboration with Claude Opu
 - A subspace `W` is *invariant* if `gW = W` for every `g` in `G`.
 - A *finite sum of finite intersections of members* is a subspace `∑_{s ∈ S} ⋂_{x ∈ s} A_x`, where `S` is a finite
   nonempty set of finite nonempty subsets of `X`.
-- `K_r = ∑_{j=1}^{r} ⌈(r+1)/j⌉`. Then `K_r ≤ r (r+1)`. Also `K_r ≤ (r+1)(1 + 1/2 + ... + 1/r) + r`, so `K_r = O(r log r)`.
+- `K_r = ∑_{j=1}^{r} ⌈(r+1)/j⌉`. Lean proves `K_r ≤ r (r+1)` (`KPFull/PartB.lean`, line 231). On paper, not in Lean:
+  `(r+1) H_r ≤ K_r ≤ r (H_r + 1)` with `H_r = 1 + 1/2 + ... + 1/r`. So `K_r = O(r log r)`, and the bound `r K_r` is
+  `O(r^2 log r)`. Examples: `K_1 = 2`, `K_2 = 5`, `K_3 = 8`, `K_10 = 37`.
 
 ### Theorem A and the conjecture
 
@@ -120,7 +122,7 @@ the list of checks. "Paper proof" means a proof written by one model and read li
 The conjecture after Theorem A has two parts.
 
 - *Polynomial.* This part holds, for every group and not only for finite groups, in the exact form of Theorem A: S2 gives
-  `r^2 (r+1)`, and S2' gives `O(r^2 log r)`.
+  `r^2 (r+1)`, and S2' gives `r K_r`, which is `O(r^2 log r)` (a paper estimate of `K_r`, see Terms).
 - *Possibly linear.* This part is false in the one-sided form of Theorem A, already for finite groups and one orbit:
   by B1, the second bound must be at least `r^2` for infinitely many `r`. S1 shows that `r (r+1)` is enough when `W` can be
   any invariant subspace. With the form of Theorem A, the second bound lies between `r^2` and `r K_r`.
@@ -151,6 +153,11 @@ group (statement 1 below) and `δ ≤ 3r` for families (B3). With the form of Th
    `K_r` steps `L` lies in `W`, and each step removed at most `r` dimensions from `L`. The sum `D` of all finite
    intersections of members inside `W` is invariant, it is a finite sum, `d(D, A_x) ≤ r` and `d(A_x, D) ≤ r K_r`.
 
+The main lemma for the polynomial bound is the contraction step of item 4: `KPFull.PartB.descent_of_first_order`
+(`KPFull/PartB.lean`, line 492; the form used in the proof is `descent_of_export`, line 537). `docs/NOTE.pdf` explains
+how it enters the proof, step by step, with the Lean name and line of each step, and gives the example for formula (3)
+explicitly.
+
 ## The single-orbit case and the Section 3 question (all in Lean)
 
 In statements 1 to 4 the group `G` is finite.
@@ -168,7 +175,12 @@ In statements 1 to 4 the group `G` is finite.
 4. **A question in the paper has a negative answer.** For finite `G` the paper proposes the explicit subspace
    `A₀ = ∑ A_S`, the sum over all sets `S` of more than half of the group, where `A_S` is the intersection of the `gA`
    with `g` in `S` (formula (3)). It asks whether `A₀` is near `A`, with a polynomial bound in `r`. It is not: for each
-   `c` there is an example with `r = 1`, `A₀ = 0` and `dim A > c`.
+   `c` there is an example with `r = 1`, `A₀ = 0` and `dim A > c`. The example: the group `H` of the `2n`-th roots of unity
+   acts on `ℂ^n` by `t·(x_1, ..., x_n) = (t x_1, t^2 x_2, ..., t^n x_n)`, and `A` is the hyperplane `x_1 + ... + x_n = 0`.
+   Then `tA` is the kernel of `∑ t^(-i) x_i`, so `r = 1`; a set `S` with `|S| > |H|/2` has at least `n` elements, and `n`
+   of these forms are linearly independent (Vandermonde), so `A₀ = 0`, while `dim A = n − 1`. Lean:
+   `AlmostInvariant.question_negative` (`AlmostInvariant/Question.lean`, line 127, for any field) and
+   `question_negative_complex` (line 151, with `n = c + 2`).
 
 5. **All groups.** For every group `G`, finite or infinite, and `V` of finite dimension over a field, there is an invariant
    `W` with total error at most `2r`, and there is an invariant `W` with `dim W / (W ∩ A) ≤ r` and
@@ -299,6 +311,7 @@ are in `logs/`.
 | `FIDELITY.md` | Theorem A against the Lean statements, clause by clause |
 | `REMARKS.md` | the remarks B1 to B5 and their checks |
 | `PROOF.md` | the proof of the full statement in prose |
+| `docs/NOTE.pdf`, `docs/NOTE.tex` | the main lemma and the order of the proof with Lean names and lines; the constant `K_r`; the example for formula (3) |
 
 ## Licence
 

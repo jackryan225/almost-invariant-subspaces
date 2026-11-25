@@ -56,7 +56,7 @@ at least when `G` is finite.
 
 | Part | Status here |
 |---|---|
-| polynomial, in the exact form of Theorem A | **Proved in Lean** for every group: S2 (`r^2 (r+1)`), S2' (`r K_r = O(r^2 log r)`), S4. |
+| polynomial, in the exact form of Theorem A | **Proved in Lean** for every group: S2 (`r^2 (r+1)`), S2' and S4 (`r K_r`). On paper (not in Lean): `r K_r = O(r^2 log r)`, because `K_r ≤ r (1 + 1/2 + ... + 1/r + 1)`. |
 | polynomial, without the form of `W` | **Proved in Lean**: S1 (`r (r+1)`). |
 | possibly linear, in the one-sided form of Theorem A | **False** (paper remark B1 in `REMARKS.md`): for each prime power `q` there is one orbit of a finite group with `r = q` in which every invariant `W` with `d(W, A_x) ≤ r` has `d(A_x, W) = r^2`. |
 | linear, for the total error `δ = d(A_x, W) + d(W, A_x)` | Different statement, not in the paper. With any invariant `W`: true for families with `3r` (B3), and `2r` is false for families (B3). With `W` of the form of Theorem A: false, the total error can be at least `c r log r / log log r` (B4). |

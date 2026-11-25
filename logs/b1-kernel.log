@@ -1,0 +1,20 @@
+=== start 2026-11-25T15:08:57Z on <host> in <home>/pnp-remote/p4-b1-patch
+ 'sh' '../scripts/slot.sh' 'sh' '-c' 'ulimit -n 8192; sh ../scripts/lc-batch.sh p4b1 4 KPLower KPLower.Coord KPLower.Plane KPLower.Group KPLower.Invariant KPLower.LowerBound KPLower.Corollaries Challenge.StatementB1; sh ../scripts/l4l-big.sh p4b1 KPLower KPB1.kp_one_sided_lower_bound KPB1.kp_one_sided_bound_ge_sq KPB1.kp_one_sided_not_linear KPB1.kp_one_sided_not_linear_complex'
+=== slot 2 of 16 after 0 s wait
+batch 1: exit 0, replayed 7, peak 43.6 GB
+batch 2: exit 0, replayed 4, peak 20.6 GB
+TOTAL: batches 2, failed 0, modules replayed 11
+--- lean4export KPLower -- KPB1.kp_one_sided_lower_bound KPB1.kp_one_sided_bound_ge_sq KPB1.kp_one_sided_not_linear KPB1.kp_one_sided_not_linear_complex
+        6.71 real         4.60 user         1.89 sys
+          5843271680  maximum resident set size
+export bytes 168988431
+--- lean4export: exit 0
+theorems in export: 20254 axioms in export: ['Classical.choice', 'Quot.sound', 'propext'] missing named theorems: []
+EXPORT-OK
+--- lean4lean --import p4b1.ndjson
+checked 27809 declarations
+       13.59 real        13.46 user         0.09 sys
+           321781760  maximum resident set size
+--- lean4lean: exit 0
+=== slot: ran 56 s, peak RSS of one process 43.59 GB
+=== exit 0 at 2026-11-25T15:09:53Z

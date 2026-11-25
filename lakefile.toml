@@ -1,5 +1,5 @@
 name = "almost_invariant"
-defaultTargets = ["AlmostInvariant", "KPFull"]
+defaultTargets = ["AlmostInvariant", "KPFull", "KPLower"]
 
 [leanOptions]
 autoImplicit = false
@@ -17,7 +17,11 @@ name = "AlmostInvariant"
 [[lean_lib]]
 name = "KPFull"
 
+# The Lean proof of remark B1 (the one-sided bound needs order r^2). The root file KPLower.lean imports every proof file.
+[[lean_lib]]
+name = "KPLower"
+
 # The statements alone, with `sorry` in place of the proofs. Not a default target.
 [[lean_lib]]
 name = "Challenge"
-roots = ["Challenge.Statement", "Challenge.StatementFull"]
+roots = ["Challenge.Statement", "Challenge.StatementFull", "Challenge.StatementB1"]

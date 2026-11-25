@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: lake build
       - name: No sorry in the proofs
-        run: "! grep -rn -E 'sorry|native_decide|^axiom ' AlmostInvariant AlmostInvariant.lean KPFull KPFull.lean"
+        run: "! grep -rn -E 'sorry|native_decide|^axiom ' AlmostInvariant AlmostInvariant.lean KPFull KPFull.lean KPLower KPLower.lean"
       - name: Axioms
         run: |
           set -o pipefail
@@ -33,11 +33,18 @@ jobs:
           lake env lean Check/AxiomsFull.lean | tee axioms-full.txt
           if grep -q -E 'sorryAx|ofReduceBool|trustCompiler' axioms-full.txt; then exit 1; fi
           test "$(grep -c 'depends on axioms: \[propext, Classical.choice, Quot.sound\]' axioms-full.txt)" -eq 9
+      - name: Axioms, remark B1
+        run: |
+          set -o pipefail
+          lake env lean Check/AxiomsB1.lean | tee axioms-b1.txt
+          if grep -q -E 'sorryAx|ofReduceBool|trustCompiler' axioms-b1.txt; then exit 1; fi
+          test "$(grep -c 'depends on axioms: \[propext, Classical.choice, Quot.sound\]' axioms-b1.txt)" -eq 4
       - name: Same statements
         run: |
           lake build Challenge
           lake env lean Check/SameStatement.lean
           lake env lean Check/SameStatementFull.lean
+          lake env lean Check/SameStatementB1.lean
       - name: The new statements contain the old one-sided statement
         run: |
           set -o pipefail

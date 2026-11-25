@@ -1,0 +1,44 @@
+=== start 2026-11-25T15:07:49Z on <host> in <home>/pnp-remote/p4-b1-patch
+ 'sh' '../scripts/slot.sh' 'sh' 'ci-b1.sh'
+=== slot 1 of 16 after 0 s wait
+--- lakefile
+2:defaultTargets = ["AlmostInvariant", "KPFull", "KPLower"]
+20:# The Lean proof of remark B1 (the one-sided bound needs order r^2). The root file KPLower.lean imports every proof file.
+22:name = "KPLower"
+27:roots = ["Challenge.Statement", "Challenge.StatementFull", "Challenge.StatementB1"]
+--- sha256
+82dc661f8919f930175599f9752609af70b2c7d0683f1c4b812a958ce0df797f  KPLower.lean
+c7c3fc5b95bbca42f07c395a6769665bcd95f1f2975a6f7be1726e459c51be3a  KPLower/Coord.lean
+ffdcddd3df229b56327a50ae7529c6f7fc0e42cdf824baee8609ddaf8b671e4f  KPLower/Corollaries.lean
+1377f8f35446a3343d69be0a9d518c80f25f9e00620d08fddbe105b6c471c4bb  KPLower/Group.lean
+edcc236d5b482521b9f0c17aebdf629c59850120659f85fe464cb265e32fcfef  KPLower/Invariant.lean
+5d1ba07486ebd66c1058199c512486fec3a5b33a8b73e298d37fbd2df5004f85  KPLower/LowerBound.lean
+2c1b522f3d7adbc957837b8c3afe994735ed9f434f7a919fd109c25778ae2c56  KPLower/Plane.lean
+6b44fd543426520d64d890e0db8792a20b116fd6afeb23c0fa106af0172c370b  Challenge/StatementB1.lean
+ff33936468360754606af0de8da05f98e25332b6181e06215997d18a036c14ae  Check/AxiomsB1.lean
+a0db322f7d7363f24957414563411347a9b803207f1077d056cd8a1dbd18b33e  Check/SameStatementB1.lean
+--- lake build
+✔ [8943/8945] Built KPLower.Corollaries (3.0s)
+✔ [8944/8945] Built KPLower (2.8s)
+Build completed successfully (8945 jobs).
+--- grep sorry
+none
+--- Axioms
+11
+--- AxiomsFull
+9
+--- AxiomsB1
+'KPB1.kp_one_sided_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPB1.kp_one_sided_bound_ge_sq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPB1.kp_one_sided_not_linear' depends on axioms: [propext, Classical.choice, Quot.sound]
+'KPB1.kp_one_sided_not_linear_complex' depends on axioms: [propext, Classical.choice, Quot.sound]
+--- Same statements
+Build completed successfully (8927 jobs).
+the five statements are equal as terms
+the five statements of the full form are equal as terms; no proved theorem uses sorryAx
+the four statements of remark B1 are equal as terms; no proved theorem uses sorryAx
+--- Contains
+2
+CI OK
+=== slot: ran 50 s, peak RSS of one process 5.57 GB
+=== exit 0 at 2026-11-25T15:08:39Z

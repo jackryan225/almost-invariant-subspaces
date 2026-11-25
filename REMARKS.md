@@ -10,14 +10,16 @@ Words used for the checks:
 - *Blind check*: another model received only the statement, without the proof, and had to prove it or refute it.
 - *Exact computation*: a program with integer or finite-field arithmetic only, no floating point.
 
-None of these checks is a check by Lean. No professional mathematician has refereed these remarks.
+None of these checks is a check by Lean. No professional mathematician has refereed these remarks. Remark B1 is now
+also a Lean theorem (`Challenge/StatementB1.lean`, proofs in `KPLower/`); its paper proof stays here.
 
-## B1. The one-sided bound needs order `r^2`
+## B1. The one-sided bound needs order `r^2` (now in Lean)
 
 **Statement.** Let `q` be a prime power. There are a finite group `G`, a complex vector space `V` and one orbit of subspaces
 with `d(A_x, A_y) ≤ r := q` for all members, such that every invariant `W` with `d(W, A_x) ≤ r` for all `x` has
 `d(A_x, W) = q^2 = r^2`. So in the one-sided form of Theorem A the second bound must be at least `r^2` for infinitely many
-`r`. A linear bound is impossible, and the bound `r (r+1)` of S1 is optimal up to the factor `(r+1)/r`.
+`r`. A linear bound is impossible, and the bound `r (r+1)` of S1 is optimal up to the factor `(r+1)/r` for every prime
+power `r`.
 
 **Proof.** Let `P` be the set of the `q^2 + q + 1` points of the projective plane over the field with `q` elements, and
 `V = ℂ^P` with basis `e_p`. For each line `ℓ` put `A_ℓ = span{e_p : p ∉ ℓ}`. A line has `q + 1` points, so
@@ -31,6 +33,13 @@ set `T`, and `T` is invariant under `PGL_3(F_q)`, which is transitive on points.
 **Checks.** Paper proof. The example is in the notes of the single-orbit work and in the proof text of GPT-6.2 Astra
 (`PROOF.md`, Section 6). A Claude agent read it. An exact computation for `q = 2` (the Fano plane, `r = 2`) gives
 `d(A, W) = 4 = r^2` for the subspace that the proof of S2 builds.
+Lean: `KPB1.kp_one_sided_lower_bound` proves the statement for every division ring with `2 ≠ 0` (so for `ℂ` and every field
+of characteristic other than 2), with the corollaries `KPB1.kp_one_sided_bound_ge_sq` and `KPB1.kp_one_sided_not_linear`;
+see `README.md` and `FIDELITY.md`, section 7. The sign changes are where `2 ≠ 0` is used. Exact computations (integer
+arithmetic): for `q = 2, 3, 4` the example has `r = q`, and over `ℚ` the commutant of the group is the scalars, so the only
+invariant subspaces are `0` and `V`; over `F_3` and `F_5` (`q = 2`) and over `F_3` (`q = 3`) the lattice of all invariant
+subspaces is `{0, V}` as well. Over `F_2` the sign changes are trivial and the example fails: for `q = 2` the invariant
+`[7, 3]` simplex code `W` has `d(W, A) = 2` and `d(A, W) = 3 < 4`. Characteristic 2 is not covered.
 
 ## B2. Total error `2r − 1` for one orbit
 

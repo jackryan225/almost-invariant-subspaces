@@ -1,7 +1,8 @@
 # Almost invariant subspaces are close to invariant subspaces, in Lean 4
 
 **Machine-checked proofs of Theorem A of Kazhdan and Polishchuk in its original form, for every group and every dimension,
-with the bound `r (r+1)^(r+1)` replaced by `r^2 (r+1)`, and of the single-orbit case with a linear bound.**
+with the bound `r (r+1)^(r+1)` replaced by `r^2 (r+1)`, and of the single-orbit case with a linear bound. A
+machine-checked lower bound shows that the one-sided bound cannot be linear: it is at least `r^2` for every prime power `r`.**
 Published on 25 November 2026 (preprint, not yet peer reviewed). All main theorems below are machine-checked in Lean 4 with Mathlib (CI passing; standard axioms only).
 
 Orchestrated and formally verified by Jack Ryan in collaboration with Claude Opus 5.5, Claude Fable 5.2, GPT-6.2 Astra, and Gemini 4 Neon.
@@ -76,15 +77,40 @@ More Lean theorems. They have no twin in the challenge file.
   `Challenge/Statement.lean` (statement 2 of the single-orbit case below), derived from S3. S3 has no condition on the
   dimension and no condition on the group.
 
+### The lower bound: the one-sided bound needs order `r^2` (remark B1, in Lean)
+
+`Challenge/StatementB1.lean` imports Mathlib only and states four theorems in the namespace `KPLower`, with `sorry` in
+place of each proof. The proved twins are in the folder `KPLower/` (namespace `KPB1`). `Check/SameStatementB1.lean` checks
+that each statement and its twin have the same type, as terms, and `Check/AxiomsB1.lean` prints their axioms (`propext`,
+`Classical.choice`, `Quot.sound`).
+
+| Statement in `Challenge/StatementB1.lean` | Proved theorem | Content |
+|---|---|---|
+| `KPLower.kp_one_sided_lower_bound` | `KPB1.kp_one_sided_lower_bound` | For every division ring `K` with `2 ≠ 0` and every prime power `q`, there are a finite group, a finite-dimensional space `V` and a subspace `A` with `d(A, gA) ≤ q` for every `g`, such that every invariant `W` with `d(W, A) ≤ q` has `d(A, W) = q^2`. |
+| `KPLower.kp_one_sided_bound_ge_sq` | `KPB1.kp_one_sided_bound_ge_sq` | If S3 holds with a function `f(r)` in place of `r (r+1)` (for all finite groups and finite-dimensional spaces over `K`), then `f(q) ≥ q^2` for every prime power `q`. |
+| `KPLower.kp_one_sided_not_linear` | `KPB1.kp_one_sided_not_linear` | There are no constants `a` and `b` such that S3 holds with `a r + b` in place of `r (r+1)`. |
+| `KPLower.kp_one_sided_not_linear_complex` | `KPB1.kp_one_sided_not_linear_complex` | The same over `ℂ`. |
+
+The quantities are those of S3: the hypothesis `d(A, gA) ≤ r` and the two bounds `d(W, A) ≤ r` and `d(A, W)` are the same
+Lean terms as in S3. The example is the one of the remark, with the plane written as `ℙ F ((Fin 2 → F) × F)` for the field `F` with `q`
+elements: `V = K^P` for the set `P` of its `q^2 + q + 1` points, `A` = the functions that vanish on the `q + 1` points of
+the line `ℙ F (Fin 2 → F)`, and the group is the semidirect product of the sign changes `P → ℤˣ` with all `F`-linear
+automorphisms of `F^3`, acting by signed permutations of the coordinates. The proof of `d(A, gA) ≤ q`: two planes through
+`0` in `F^3` meet in a line, so two lines of the projective plane meet. The proof that `W = 0`: a sign change isolates the
+coordinates of every vector of `W` (here `2 ≠ 0` is used), and `GL_3` is transitive on the points, so `W = 0` or `W = V`,
+and `d(V, A) = q + 1 > q`.
+
+The scalars: every division ring with `2 ≠ 0`, so `ℂ` (as in the remark) and every field of characteristic other than 2.
+Characteristic 2 is not covered: there the sign changes are trivial, and for `q = 2` over `F_2` this example gives only
+`3` (exact computation, `REMARKS.md`, B1). So in S1 and S3 the bound `r (r+1)` is optimal up to the factor `(r+1)/r` for
+every prime power `r`.
+
 ### Remarks on paper (not in Lean)
 
-These results are not theorems of the Lean files. `REMARKS.md` has each statement, its proof or a reference to it, and
+These results are not theorems of the Lean files. Remark B1 is now in Lean (section above); `REMARKS.md` keeps its paper
+proof. `REMARKS.md` has each statement, its proof or a reference to it, and
 the list of checks. "Paper proof" means a proof written by one model and read line by line by at least one other agent.
 
-- **B1. The one-sided bound needs order `r^2`.** For each prime power `q` there is a finite group and one orbit of
-  subspaces of a complex coordinate space with `r = q`, such that every invariant `W` with `d(W, A) ≤ r` has
-  `d(A, W) = r^2`. The example uses the lines of the projective plane over the field with `q` elements. Paper proof,
-  read by a second agent; exact check for `q = 2`.
 - **B2. Total error `2r − 1` for one orbit.** For `r = 2^(k−2)` there is one orbit of `GL_k(F_2)` where every subspace has
   total error at least `2r − 1` to some member. So statement 1 of the single-orbit case is optimal. Paper proof, read by
   two agents.
@@ -124,7 +150,8 @@ The conjecture after Theorem A has two parts.
 - *Polynomial.* This part holds, for every group and not only for finite groups, in the exact form of Theorem A: S2 gives
   `r^2 (r+1)`, and S2' gives `r K_r`, which is `O(r^2 log r)` (a paper estimate of `K_r`, see Terms).
 - *Possibly linear.* This part is false in the one-sided form of Theorem A, already for finite groups and one orbit:
-  by B1, the second bound must be at least `r^2` for infinitely many `r`. S1 shows that `r (r+1)` is enough when `W` can be
+  by B1 (in Lean: `KPB1.kp_one_sided_bound_ge_sq`, `KPB1.kp_one_sided_not_linear`), the second bound must be at
+  least `r^2` for every prime power `r`. S1 shows that `r (r+1)` is enough when `W` can be
   any invariant subspace. With the form of Theorem A, the second bound lies between `r^2` and `r K_r`.
 
 For the total error `δ`, linear bounds exist when `W` can be any invariant subspace: `δ < 2r` for one orbit of a finite
@@ -262,10 +289,12 @@ Wagner (1998). If you know an earlier proof, please open an issue, and we will c
 
 ## What is not claimed
 
-- A linear bound for `d(A_x, W)` in the one-sided form of Theorem A. It is false already for finite groups and one orbit (B1);
-  in S1 and S3, `r (r + 1)` is optimal up to the factor `(r + 1)/r`.
+- A linear bound for `d(A_x, W)` in the one-sided form of Theorem A. It is false already for finite groups and one orbit (B1,
+  in Lean for division rings with `2 ≠ 0`); in S1 and S3, `r (r + 1)` is optimal up to the factor `(r + 1)/r` for every
+  prime power `r`. For other `r` and for characteristic 2 we have no lower bound of this kind.
 - The best constants in all cases. These ranges are known:
-  - `d(A_x, W)` with `W` of the form of Theorem A: at least `r^2` in some examples, at most `r K_r = O(r^2 log r)`;
+  - `d(A_x, W)` with `W` of the form of Theorem A: at least `r^2` for every prime power `r` (B1, in Lean), at most
+    `r K_r = O(r^2 log r)`;
   - the total error for families with any invariant `W`: at least `2.021 r` in one example, at most `3r`;
   - the total error with `W` of the form of Theorem A: at least `c r log r / log log r` in some examples, at most
     `2r − 1 + r (1 + ⌊log₂ 2r⌋) = O(r log r)` for families, and at most `(1 + o(1)) r log r / log log r` for one orbit of
@@ -274,7 +303,7 @@ Wagner (1998). If you know an earlier proof, please open an issue, and we will c
   of finite dimension (whereas S1, S2, S2', S3, S4, and statement 1 have no finite-dimension restriction).
 - Lemma 2.1 (operators) and Theorem B (Galois descent) of the paper. They are not formalized directly here (S1, S3, and S4
   apply to semilinear actions via lattice automorphisms).
-- The remarks B1 to B5. They are paper proofs / exact finite-field checks and are not checked by Lean.
+- The remarks B2 to B5. They are paper proofs / exact finite-field checks and are not checked by Lean. (B1 is in Lean.)
 
 ## How to check it
 
@@ -285,12 +314,14 @@ lake env lean Check/Axioms.lean          # single-orbit results: propext, Classi
 lake env lean Check/AxiomsFull.lean      # full statement: propext, Classical.choice, Quot.sound
 lake build Challenge && lake env lean Check/SameStatement.lean && lake env lean Check/SameStatementFull.lean
 lake env lean Check/Contains.lean        # statement 2 of the single-orbit case, derived from S3
+lake env lean Check/AxiomsB1.lean        # remark B1: propext, Classical.choice, Quot.sound
+lake env lean Check/SameStatementB1.lean # remark B1: the statements of Challenge/StatementB1.lean are the proved ones
 ```
 
 The Lean version is in `lean-toolchain` (4.34.1) and Mathlib is pinned in `lake-manifest.json`. The workflow in
 `.github/workflows/check.yml` runs these steps on each push. We also replayed the compiled proofs with `leanchecker`,
-the separate kernel checker that comes with Lean, and the proofs of the full statement also with `lean4lean`. The records
-are in `logs/`.
+the separate kernel checker that comes with Lean, and the proofs of the full statement and of remark B1 also with
+`lean4lean`. The records are in `logs/`.
 
 | File | Content |
 |---|---|
@@ -308,8 +339,16 @@ are in `logs/`.
 | `Challenge/StatementFull.lean` | the five statements of the full original statement, Mathlib only, without proofs |
 | `Check/Axioms.lean`, `Check/SameStatement.lean` | the checks of the single-orbit statements |
 | `Check/AxiomsFull.lean`, `Check/SameStatementFull.lean`, `Check/Contains.lean` | the checks of the full statement |
+| `KPLower/Coord.lean` | remark B1: the coordinate subspaces `{f : f = 0 on X}` and the dimension `|Y \ X|` of their quotients |
+| `KPLower/Plane.lean` | remark B1: the projective plane over the field with `q` elements; one line and its images under `GL_3` |
+| `KPLower/Group.lean` | remark B1: the finite group of signed permutations of the points and its linear action |
+| `KPLower/Invariant.lean` | remark B1: with `2 ≠ 0`, a subspace invariant under the sign changes and a transitive group is `0` or `V` |
+| `KPLower/LowerBound.lean` | remark B1: `KPB1.kp_one_sided_lower_bound` |
+| `KPLower/Corollaries.lean` | remark B1: every valid second bound is at least `q^2` for prime powers `q`; no linear bound |
+| `Challenge/StatementB1.lean` | the four statements of remark B1, Mathlib only, without proofs |
+| `Check/AxiomsB1.lean`, `Check/SameStatementB1.lean` | the checks of remark B1 |
 | `FIDELITY.md` | Theorem A against the Lean statements, clause by clause |
-| `REMARKS.md` | the remarks B1 to B5 and their checks |
+| `REMARKS.md` | the remarks B1 to B5 and their checks (B1 is also in Lean) |
 | `PROOF.md` | the proof of the full statement in prose |
 | `docs/NOTE.pdf`, `docs/NOTE.tex` | the main lemma and the order of the proof with Lean names and lines; the constant `K_r`; the example for formula (3) |
 

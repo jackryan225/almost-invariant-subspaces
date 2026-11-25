@@ -58,7 +58,7 @@ at least when `G` is finite.
 |---|---|
 | polynomial, in the exact form of Theorem A | **Proved in Lean** for every group: S2 (`r^2 (r+1)`), S2' and S4 (`r K_r`). On paper (not in Lean): `r K_r = O(r^2 log r)`, because `K_r ≤ r (1 + 1/2 + ... + 1/r + 1)`. |
 | polynomial, without the form of `W` | **Proved in Lean**: S1 (`r (r+1)`). |
-| possibly linear, in the one-sided form of Theorem A | **False** (paper remark B1 in `REMARKS.md`): for each prime power `q` there is one orbit of a finite group with `r = q` in which every invariant `W` with `d(W, A_x) ≤ r` has `d(A_x, W) = r^2`. |
+| possibly linear, in the one-sided form of Theorem A | **False, proved in Lean** (remark B1; section 7 below): for each prime power `q` there is one orbit of a finite group with `r = q` in which every invariant `W` with `d(W, A_x) ≤ r` has `d(A_x, W) = r^2`. |
 | linear, for the total error `δ = d(A_x, W) + d(W, A_x)` | Different statement, not in the paper. With any invariant `W`: true for families with `3r` (B3), and `2r` is false for families (B3). With `W` of the form of Theorem A: false, the total error can be at least `c r log r / log log r` (B4). |
 
 ## 3. Lemma 2.1 and Theorem B
@@ -93,6 +93,27 @@ the one-sided single-orbit statement `almost_invariant_one_sided` of `Challenge/
 
 ## 6. What is machine-checked
 
-Machine-checked: S1, S2, S2', S3, S4 and the theorems listed in `README.md` under "More Lean theorems". Not
-machine-checked: everything in `REMARKS.md`, and the statements about Lemma 2.1 and Theorem B above. The build and kernel
+Machine-checked: S1, S2, S2', S3, S4, the theorems listed in `README.md` under "More Lean theorems", and remark B1
+(section 7). Not machine-checked: everything else in `REMARKS.md` (B2 to B5), and the statements about Lemma 2.1 and Theorem B above. The build and kernel
 records are in `logs/`.
+
+## 7. Remark B1 against the Lean statements
+
+`Challenge/StatementB1.lean` (Mathlib only) states B1 and three consequences in the namespace `KPLower`; the proved twins
+are `KPB1.*` in `KPLower/`. `Check/SameStatementB1.lean` checks that the types are equal as terms, and
+`Check/AxiomsB1.lean` prints the axioms.
+
+| # | B1 (`REMARKS.md`) | Lean (`KPLower.kp_one_sided_lower_bound`) | Comparison |
+|---|---|---|---|
+| 1 | `q` a prime power | `(q : ℕ) (hq : IsPrimePow q)` | **Same.** |
+| 2 | a complex vector space | any division ring `K` with `(2 : K) ≠ 0`; `V` finite-dimensional | **More general** (contains `ℂ`). Characteristic 2 is not covered. |
+| 3 | a finite group acting linearly | `∃ (G : Type) (_ : Group G) (_ : Finite G) (ρ : G →* (V ≃ₗ[K] V))` | **Same.** |
+| 4 | one orbit with `d(A_x, A_y) ≤ r := q` | `∀ g, Module.rank K (A ⧸ (A.map (ρ g)).submoduleOf A) ≤ q` | **Same** as the hypothesis `hr` of S3 with `r = q` (one orbit: `d(gA, hA) = d(A, g⁻¹hA)`). |
+| 5 | every invariant `W` with `d(W, A_x) ≤ r` | `∀ W, (∀ g, W.map (ρ g) = W) → Module.rank K (W ⧸ A.submoduleOf W) ≤ q → ...` | **Same** as the first two clauses of the conclusion of S3. |
+| 6 | has `d(A_x, W) = q^2` | `Module.rank K (A ⧸ W.submoduleOf A) = (q ^ 2 : ℕ)` | **Same** (equality, as printed). |
+
+The consequences: `KPLower.kp_one_sided_bound_ge_sq` takes as hypothesis the statement S3 with `f r` in place of
+`r (r + 1)`, restricted to finite groups and finite-dimensional spaces over `K`, and concludes `q^2 ≤ f q` for every prime
+power `q`; `KPLower.kp_one_sided_not_linear` says that no `f r = a r + b` satisfies this hypothesis. Restricting the
+hypothesis to finite groups and finite dimension makes these negative statements stronger. The universes: `V` lies in the
+universe of `K`, and `G : Type`.

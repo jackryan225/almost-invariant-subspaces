@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: lake build
       - name: No sorry in the proofs
-        run: "! grep -rn -E 'sorry|native_decide|^axiom ' AlmostInvariant AlmostInvariant.lean KPFull KPFull.lean KPLower KPLower.lean"
+        run: "! grep -rn -E 'sorry|native_decide|^axiom ' AlmostInvariant AlmostInvariant.lean KPFull KPFull.lean KPLower KPLower.lean KPLattice KPLattice.lean"
       - name: Axioms
         run: |
           set -o pipefail

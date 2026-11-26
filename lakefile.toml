@@ -1,5 +1,5 @@
 name = "almost_invariant"
-defaultTargets = ["AlmostInvariant", "KPFull", "KPLower"]
+defaultTargets = ["AlmostInvariant", "KPFull", "KPLower", "KPLattice"]
 
 [leanOptions]
 autoImplicit = false
@@ -20,6 +20,11 @@ name = "KPFull"
 # The Lean proof of remark B1 (the one-sided bound needs order r^2). The root file KPLower.lean imports every proof file.
 [[lean_lib]]
 name = "KPLower"
+
+# The same theorems for an abstract lattice with a rank function (modular lattices of finite rank).
+# The root file KPLattice.lean imports both proof files.
+[[lean_lib]]
+name = "KPLattice"
 
 # The statements alone, with `sorry` in place of the proofs. Not a default target.
 [[lean_lib]]

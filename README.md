@@ -105,6 +105,26 @@ Characteristic 2 is not covered: there the sign changes are trivial, and for `q 
 `3` (exact computation, `REMARKS.md`, B1). So in S1 and S3 the bound `r (r+1)` is optimal up to the factor `(r+1)/r` for
 every prime power `r`.
 
+### The same theorems for modular lattices of finite rank (in Lean, added 26 November 2026)
+
+The folder `KPLattice/` proves the theorems for an abstract lattice. Setting: a lattice `L` with a least element, a
+group `G` that acts by order automorphisms (`act : G →* (L ≃o L)`), and a rank function `ρ : L → ℕ`
+(`KPLattice.IsRankFn ρ`: `ρ ⊥ = 0`, strictly monotone, `+1` on a cover, and `ρ (x ⊔ y) + ρ (x ⊓ y) = ρ x + ρ y`). In a
+modular lattice of finite length, `x ↦ ℓ[⊥, x]` (the length of the interval) is such a rank function. That classical
+fact is the hypothesis here; it is not formalized. From `IsRankFn ρ` Lean proves that the lattice is modular and that
+every order automorphism keeps `ρ`. Write `d(x, y) = ρ x − ρ (x ⊓ y)`. No finiteness of `G` is assumed, except in
+`finite_group_total`.
+
+- `KPLattice/FiniteRank.lean`: `family_one_sided` (S1; families, one-sided bounds `r` and `r (r + 1)`),
+  `single_orbit_one_sided` (S3), `single_orbit_total` (one orbit, any group, total error at most `2 r`),
+  `finite_group_total` (one orbit of a finite group, `|G| δ(a, w) ≤ 2 ∑_g d(a, g a)`).
+- `KPLattice/PartBLattice.lean` (bounded lattice): `family_finite_form` (S2'; `W` is a finite join of finite meets of
+  members, fixed by the group, with `d(W, a_x) ≤ r` and `d(a_x, W) ≤ r K_r`), `family_finite_form_cubic` (S2; the
+  bound `r^2 (r + 1)`), `family_canonical` (S4; `W` fixed by every order automorphism of `L` that permutes the members).
+
+Each of these depends only on the axioms `propext`, `Classical.choice`, `Quot.sound` (the files print them at their
+ends). These two files are checked by the Lean build. They have no Mathlib-only statement file in `Challenge/` yet.
+
 ### Remarks on paper (not in Lean)
 
 These results are not theorems of the Lean files. Remark B1 is now in Lean (section above); `REMARKS.md` keeps its paper
